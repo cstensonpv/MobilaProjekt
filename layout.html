@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html manifest="cache.appcache">
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta charset="utf-8">
+    <meta name="mobile-web-app-capable" content="yes"> <!-- Fixar fullscreen-->
+    <link rel="icon" sizes="196x196" href="ikon.png"/>
+    <meta name="theme-color" content="#FFBF53"> <!-- Fixar annan färg på status bar -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <title>Compass Chat</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
+    <script>  
+      $("#news").swiperight(function(){
+        console.log("swiped");
+        $("#catPanel").panel( "open" );
+      });
+   </script>
+  </head>
+  <body>
+    <div data-role="page" id="start">
+      <div data-role="header">
+        <h1>Chat app</h1>
+      </div>
+      <div data-role="main">
+        <div style="height:50%">karta med position</div>
+        <div>chat</div>
+      </div>
+    </div>
+
+    <div data-role="page" id="chat">
+      <div data-role="header" data-position="fixed">
+        <h2>Användare: <span id="otheruser"></span></h2>
+      </div>
+      <div id="output" class="main">
+      </div>
+      <div data-role="footer" data-position="fixed" class="ui-field-contain">
+        <fieldset data-type="horizontal">
+          <input class="input-block-level" data-inline="true" type="text" placeholder="Enter chat here" id="msg" style="width=90%">
+          <button id="buttonSend" ata-inline="true" class="btn" style="width=10%">Send</button>
+        </fieldset>
+      </div>
+    </div>
+
+
+  </body>
+</html>
