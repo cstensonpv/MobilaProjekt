@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html manifest="cache.appcache">
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta charset="utf-8">
+    <title>Project Work</title>
+
+    <!-- Android -->
+    <meta name="mobile-web-app-capable" content="yes"> <!-- Fixar fullscreen-->
+    <link rel="icon" sizes="196x196" href="ikon.png"/>
+    <meta name="theme-color" content="#FFBF53"> <!-- Fixar annan färg på status bar -->
+
+    <!--  Apple -->
+    <!-- Allow web app to be run in full-screen mode. -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+     <!-- Configure the status bar. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+    <!-- Make the app title different than the page title. -->
+    <meta name="apple-mobile-web-app-title" content="Project">
+    <!-- iPhone retina icon (iOS < 7) -->
+    <link href="img/apple_startIcon.png" sizes="114x114" rel="apple-touch-icon-precomposed">
+    <!-- iPhone 5 startup image -->
+    <link href="" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+    <!-- iPhone, retina startup image-->
+    <link href="" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
+    <script src="js/model.js"></script>
+    <script>  
+      $("#news").swiperight(function(){
+        console.log("swiped");
+        $("#catPanel").panel( "open" );
+      });
+      function test(){
+        console.log('Test!');
+      }
+   </script>
+  </head>
+
+  <body onload="waitingRoom()">
+    <div data-role="page" id="start">
+      <div data-role="header">
+        <h1>Map?</h1>
+        <a href="#chat" class="ui-btn-right" position="right">Chat!</a>
+      </div>
+      <div data-role="main">
+        <div style="height:50%">karta med position</div>
+        <div>chat</div>
+        <button onclick="requestChat()">Träffa en ny människa</button>
+      </div>
+    </div>
+
+    <div data-role="page" id="chat">
+      <div data-role="header" data-position="fixed">
+        <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a>
+        <h2>Chat?<span id="otheruser"></span></h2>
+      </div>
+      <div id="output" class="main">
+        Fet Output här!
+      </div>
+
+      <!-- Tror inte vi ska ha input message i en footer. Det verkar vara svårt att style skit i en jQuery footer -->
+      <div data-role="footer" data-position="fixed" class="ui-field-contain">
+        <fieldset data-type="horizontal">
+          <input class="input-block-level" data-inline="true" type="text" placeholder="Enter message here:" id="msg" style="width=90%">
+          <button id="buttonSend" ata-inline="true" class="btn" style="width=10%">Send</button>
+        </fieldset>
+      </div>
+    </div>
+
+
+  </body>
+</html>
