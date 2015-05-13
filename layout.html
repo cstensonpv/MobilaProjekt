@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html manifest="cache.appcache">
+<html>
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <meta charset="utf-8">
@@ -24,12 +24,40 @@
     <!-- iPhone, retina startup image-->
     <link href="" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
 
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?"></script>
+    <script src="https://www.google.com/jsapi"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?"></script>
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/directions.js"></script>
+    <style type="text/css">
+    #map-directions {
+      position: absolute;
+      background-color: #E5E3DF;
+      overflow: hidden;
+      width: 100%;
+      height: 10%;
+    }
+    #durationImg{
+      width: 5vw;
+      display: inline;
+    }
+    #durationDiv{
+      background-color: white;
+    }
+    #durationTime{
+      font-size: 6vw;
+      display: inline;
+    }
+    #chat{
+      position: absolute;
+      height: 90%;
+      top:10%;
+    }
+</style>
+
     <script>  
       $("#news").swiperight(function(){
         console.log("swiped");
@@ -38,18 +66,24 @@
       function test(){
         console.log('Test!');
       }
-   </script>
+
+
+    </script>
   </head>
 
   <body>
     <div data-role="page" id="start">
-      <div data-role="header">
+      <div id ="header" data-role="header">
         <h1>Map?</h1>
         <a href="#chat" class="ui-btn-right" position="right">Chat!</a>
       </div>
-      <div data-role="main">
-        <div style="height:50%">karta med position</div>
-        <div>chat</div>
+      <div data-role="main" style="height:100%">
+        <div id="mapC" style="height:50%; width:100%;">
+          <div id="map-directions" onclick="mapExpand()"></div>
+        </div>
+        <div id="chat" onclick="mapShrink()">
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+      </div>
       </div>
     </div>
 
