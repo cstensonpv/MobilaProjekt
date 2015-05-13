@@ -31,6 +31,7 @@
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
     <script src="js/model.js"></script>
+    <!-- <script src="js/app.js"></script> -->
     <script>  
       $("#news").swiperight(function(){
         console.log("swiped");
@@ -60,6 +61,7 @@
         <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a>
         <h2>Chat?<span id="otheruser"></span></h2>
       </div>
+      <button onclick="requestChat()">Träffa en ny människa</button>
       <div id="output" class="main">
         Fet Output här!
       </div>
@@ -68,7 +70,7 @@
       <div data-role="footer" data-position="fixed" class="ui-field-contain">
         <fieldset data-type="horizontal">
           <input class="input-block-level" data-inline="true" type="text" placeholder="Enter message here:" id="msg" style="width=90%">
-          <button id="buttonSend" ata-inline="true" class="btn" style="width=10%">Send</button>
+          <button id="buttonSend" ata-inline="true" class="btn" style="width=10%" onclick="sendMsg(getElementById('msg').value)">Send</button> <!-- Alternativt ska det vara $("#msg") som argument-->
         </fieldset>
       </div>
     </div>
