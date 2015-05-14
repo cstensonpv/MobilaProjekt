@@ -10,16 +10,15 @@ myShakeEvent.start();
 //function to call when shake occurs
 function shakeEventDidOccur () {
     //put your own code here etc.
-    alert('shake!');
-    functionToFire();
-}
+    window.navigator.vibrate(3000);
+};
 
 function activateShake(functionToFire){
     //alert("activateShake");
     window.addEventListener('shake', shakeEventDidOccur, false); // ändra till functionToFire
-}
+};
 
 function disableShake(){
     //alert("disableShake");
     window.removeEventListener('shake', shakeEventDidOccur, false);
-}
+};
