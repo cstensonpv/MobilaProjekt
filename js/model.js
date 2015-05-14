@@ -1,18 +1,20 @@
 //Model
 
 //var model = function () {
-  //Get UUID from user and specify PubNub keys
+ 
   var usrLat;
   var usrLng;
   var observers = [];
   var chatPartner = "hejsan"; //Reserverad för den person som man chattar med aktuellt
   var chatRoom; //Det rum två chattande personer är i
 
+
+  //Get UUID from user and specify PubNub keys
   var UUID = PUBNUB.db.get('session') || (function(){ 
     var uuid = PUBNUB.uuid(); 
     PUBNUB.db.set('session', uuid);
     console.log(uuid);
-    return uuid; 
+    return uuid;
   })();
 
 
@@ -25,7 +27,7 @@
   var users =[];
   var activeChannels = ['moo']
 
-  setInterval(getLocation(), 1000);
+  setInterval(getLocation(), 1000);//kanske kan vara lite längre?
   console.log(userId);
 
 
@@ -64,7 +66,7 @@
   function unsubAll() {
   	for(var x in activeChannels){
   		pubnub.unsubscribe({'channel': activeChannels[x]})
-  		activeChannels = [];
+  		activeChannels = [];//Borde ligga efter forloopen va?
   	}
   }
 
