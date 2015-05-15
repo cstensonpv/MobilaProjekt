@@ -5,42 +5,53 @@ var directionsService = new google.maps.DirectionsService();
 var dMap;
 
 function initialize() {
-  console.log("initialize");
-  directionsDisplay = new google.maps.DirectionsRenderer();
-  var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+  console.log("Initializing google maps");
+  var stockholm = new google.maps.LatLng(59.3275, 18.0675);
   var mapOptions = {
-    zoom:7,
-    center: chicago,
+    zoom:2,
+    center: stockholm,
     disableDefaultUI: true
   };
-  dMap = new google.maps.Map(document.getElementById("map-directions"), mapOptions);
+  var mapDiv = document.getElementById("map-directions");
+  var chatDiv = document.getElementById("chatDiv");
+  dMap = new google.maps.Map(mapDiv, mapOptions);
+  directionsDisplay = new google.maps.DirectionsRenderer();
   directionsDisplay.setMap(dMap);
-  console.log(dMap);
   newControl(dMap,'');
+  mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
+  chatDiv.style.height = (window.innerHeight*0.83).toFixed(0)-44.375 + 'px'; // 44.375 är höjden på headern i iPhone 5.
   calcRoute("karlaplan,stockholm","odenplan,stockholm");
 }
 
-function mapExpand(){
+function mapExpand(){  
+  // kollar ifall kartan är liten, om så, ändrar storlek till stor. Visar Stäng Karta knapp och gömmer chatten.
+  var map = $('#map-directions');
+  var smallMapHeight = (window.innerHeight*0.17).toFixed(0) + 'px';
+  var bigMapHeight = (window.innerHeight).toFixed(0)-44.375+ 'px'; // 44.375 är höjden på headern i iPhone 5.
 
-  
-  var map = document.getElementById("map-directions");
-  var chat = document.getElementById("chat");
-  if(map.style.height != "50%"){
-    console.log("expand");
-    map.style.height = '50%';
-    calcRoute("karlaplan,stockholm","odenplan,stockholm");
+  if(map.css('height') == smallMapHeight){
+    console.log("Expanding map");
+    map.animate({height : bigMapHeight},200,'swing',function(){ // när animationen är klar, gör detta:
+      $('#chatDiv').hide();
+      $('#closeMap').show();
+      calcRoute("karlaplan,stockholm","odenplan,stockholm");
+      google.maps.event.trigger(dMap, 'resize'); //uppdaterar rendrering på kartan. Resizar kartan för fönsterstorleken.
+    });
   }
- 
 }
+
 function mapShrink(){
-  
-  var map = document.getElementById("map-directions");
-  if(map.style.height !== "10%"&&map.style.height !==""){
-    console.log("shrink");
-    map.style.height = "10%";
-    calcRoute("karlaplan,stockholm","odenplan,stockholm");
-  }
-  
+  // Ändrar kartstorlek till liten. Gömmer Stäng Karta knapp och visar chatten.
+  console.log("Shrinks map");
+  var map = $('#map-directions');
+  var smallMapHeight = (window.innerHeight*0.17).toFixed(0) + 'px';
+
+  map.animate({height : smallMapHeight},200,'swing',function(){
+    $('#closeMap').hide();
+    //calcRoute("karlaplan,stockholm","odenplan,stockholm");
+    google.maps.event.trigger(dMap, 'resize');
+  });
+  $('#chatDiv').show();
 }
 
 function calcRoute(yourPos, otherPos) {
@@ -57,7 +68,6 @@ function calcRoute(yourPos, otherPos) {
       alert("API anrop slut!");
     };
   });
-  
 };
 
 function newControl(map, text) { //Funktion för diverse kontrollknappar.
@@ -80,7 +90,7 @@ function newControl(map, text) { //Funktion för diverse kontrollknappar.
       controlDiv.appendChild(controlText);
 
       // Setup the click event listeners: simply set the map to
-      // Chicago
+      // stockholm
       google.maps.event.addDomListener(controlDiv);
       map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
 
