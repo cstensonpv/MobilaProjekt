@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    	<meta charset="utf-8">
+    	<meta name="mobile-web-app-capable" content="yes"> <!-- Fixar fullscreen-->
+    	<link rel="icon" sizes="196x196" href="ikon.png"/>
+  		<meta name="theme-color" content="#FFBF53"> <!-- Fixar annan färg på status bar -->
+    	<!-- <link rel="apple-touch-startup-image" href="http://s649.photobucket.com/user/santod_photos/media/Androidonapple.jpg.html?t=1259524013" sizes="480x800" /> -->
+    	<title>Map-app!</title>
+    	<!-- <link rel="icon" sizes="192x192" href="ikon.png">  vilken ikon som är desktopikon när man laddar ned sidan som app -->
+    	<style type="text/css">
+      		html, body, #map-canvas { height: 95%; margin: 0; padding: 0;}
+    	</style>
+    	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+    	<script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
+    	<script src="js/model.js"></script>
+
+    	<script>
+
+
+
+    	var usrLat;
+    	var usrLng;
+    	//var accuracy;
+    	var position_Marker;
+    	var activeChannels = ["12 : 13"];
+		var you_image = {
+			url: "http://cpansearch.perl.org/src/HTCHAPMAN/RTx-Timeline-0.03/html/Search/Elements/timeline-api/images/dark-blue-circle.png",
+			// This marker is 20 pixels wide by 32 pixels tall.
+			size: new google.maps.Size(16, 16),
+			// The origin for this image is 0,0.
+			origin: new google.maps.Point(0,0),
+			// The anchor for this image is the base of the flagpole at 0,32.
+			anchor: new google.maps.Point(0, 32)
+		};
+
+		var other_image = {
+			url: "http://katehazlittnd.ca/site/wp-content/plugins/sexybookmarks/images/circle_yellow.png",
+			// This marker is 20 pixels wide by 32 pixels tall.
+			size: new google.maps.Size(16, 16),
+			// The origin for this image is 0,0.
+			origin: new google.maps.Point(0,0),
+			// The anchor for this image is the base of the flagpole at 0,32.
+			anchor: new google.maps.Point(0, 32)
+		};
+		function getLocation() {
+		    if (navigator.geolocation) {
+		        setGeolocation();
+		    } else { 
+		        x.innerHTML = "Geolocation is not supported by this browser.";
+		    }
+		}
+
+		function addMarker(image, LatLng, content){
+			console.log("adds marker "+content);
+			var newMarker = new google.maps.Marker({
+				map:Gmap,
+				draggable: false,
+				animation: google.maps.Animation.DROP,
+				position: LatLng,
+				icon: image 
+			})
+			var infowindow = new google.maps.InfoWindow({
+			      content: content
+			  });
+			google.maps.event.addListener(newMarker, 'click', function() {
+			    infowindow.open(map,newMarker);
+			  });
+			  return newMarker;			
+		}
+
+		function changeMarkerPosition(marker,newLatLng){
+			marker.setPosition(newLatLng);
+			console.log("updates position");
+		}	
+    	function initialize() {
+		  	var mapOptions = {
+			    zoom: 16,
+			    center: new google.maps.LatLng(59, 18),
+			    //disableDefaultUI: true,
+				disableDoubleClickZoom: true
+		  		}
+		  	Gmap = new google.maps.Map(document.getElementById("map-canvas"),
+		    mapOptions); //fullösning att göra denna publik?
+
+		    addMarker(other_image,new google.maps.LatLng(59.347184,18.072588),"1 position");
+		    addMarker(other_image,new google.maps.LatLng(59.348955,18.074346),"2 position");
+		}
+
+		function geohash( coord, resolution ) {
+
+			var rez = Math.pow( 10, resolution || 0 );
+			geohashLat = Math.floor(coord.latitude * rez);//returns an integer / rez;
+			geohashLng = Math.floor(coord.longitude * rez);//returns an integer / rez; 
+			subscribeChannels(geohashLat, geohashLng);
+			return geohashLat+" : "+geohashLng;
+		}
+
+		function subscribeChannels(geohashLat, geohashLng){
+			
+			var newChannels = [];
+			var channelChanged = false;
+			console.log(activeChannels);
+			for(var lat = geohashLat -1; lat <= geohashLat+1; lat++){
+				for(var lng = geohashLng -1; lng <= geohashLng+1; lng++){
+					newChannels.push(lat +" : "+ lng);
+				}
+			}
+			console.log(newChannels);
+			for(var channel = 0; channel<9; channel++){
+				if(activeChannels.indexOf(newChannels[channel]) === -1){
+					//ny subscribe
+					channelChanged = true;
+					activeChannels.push(newChannels[channel]);
+					subscribe(newChannels[channel]);
+					console.log("sub: "+ newChannels[channel])
+				}
+				if(newChannels.indexOf(activeChannels[channel]) === -1){
+					//unsubscribe
+					//console.log(activeChannels);
+					channelChanged = true;
+					console.log("unsub: "+ activeChannels[channel])
+					unsubscribe(activeChannels[channel]);
+					activeChannels.splice(channel, 1);
+					
+				}
+			}
+
+			console.log(activeChannels);
+		}
+
+		function subscribe(channelName){
+			pubnub.subscribe({
+		      'channel'   : channelName,
+		      'callback'  : function(msg) {
+		        if (msg.sender === userId) {
+		          $("#output").append(printMsg("sentMsg", msg.contents, msg.sender)); //senare ska vi skicka namn istället för msg.sender
+		        }
+		        else {
+		          $("#output").append(printMsg("recievedMsg", msg.contents, msg.reciever));
+		        }
+		      }
+		    });
+		}
+		function unsubscribe(channelName){
+			pubnub.unsubscribe({
+		      'channel'   : channelName,
+		    });
+		}
+
+		function setGeolocation() {
+		    var geolocation = window.navigator.geolocation.getCurrentPosition( 
+		        function ( position ) {
+		            usrLat = position.coords.latitude;
+		            usrLng = position.coords.longitude;
+		            //accuracy = position.coords.accuracy;
+		            console.log(geohash(position.coords,10));
+					if(position_Marker){
+						changeMarkerPosition(position_Marker,new google.maps.LatLng(usrLat,usrLng));
+					}else{
+						position_Marker = addMarker(you_image,new google.maps.LatLng(usrLat,usrLng),"Your position");
+						Gmap.panTo(new google.maps.LatLng(usrLat,usrLng));
+					}
+		        },
+		        function () {console.log("error") }, {
+		            maximumAge: 250, 
+		            enableHighAccuracy: true
+
+		        } 
+		    );
+
+		    window.setTimeout( function () {
+		            window.navigator.geolocation.clearWatch( geolocation ) 
+		        }, 
+		        5000 //stop checking after 5 seconds
+		    );
+		};
+
+		google.maps.event.addDomListener(window, 'load', initialize);
+
+		getLocation();
+
+		window.setInterval( function () {
+		        getLocation();
+		    }, 
+		    15000 //check position 15 seconds
+		);
+    	</script>
+	</head>
+	<body>
+		<div id="map-canvas"></div>
+		<div id="result"></div>
+	</body>
+</html>
