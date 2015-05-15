@@ -32,6 +32,7 @@
     <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/directions.js"></script>
+    <script src="js/model.js"></script>
     <style type="text/css">
     #map-directions {
       position: relative;
@@ -67,8 +68,29 @@
     </script>
   </head>
 
-  <body>
-    <div data-role="page" id="start">
+  <body onload="waitingRoom();">
+
+
+    <div data-role="page" id="waitingRoom">
+      <div data-role="header" data-position="fixed">
+        <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a>
+        <h2>Waiting room<span id="otheruser"></span></h2>
+      </div>
+      <div id="output" class="main">
+        Fet Output här!
+      </div>
+
+      <!-- Tror inte vi ska ha input message i en footer. Det verkar vara svårt att style skit i en jQuery footer -->
+      <div data-role="footer" data-position="fixed" class="ui-field-contain">
+        <fieldset data-type="horizontal">
+          <input class="input-block-level" data-inline="true" type="text" placeholder="Enter message here:" id="msg" style="width=90%">
+          <button id="buttonSend" ata-inline="true" class="btn" style="width=10%" onclick="requestChat()">Random</button>
+        </fieldset>
+      </div>
+    </div>
+
+
+    <div data-role="page" id="chat">
       <div id ="header" data-role="header">
         <h1>Map?</h1>
         <!-- <a href="#chat" class="ui-btn-right" position="right">Chat!</a> -->
@@ -91,7 +113,10 @@
       </div>
     </div>
 
-    <div data-role="page" id="chat">
+
+
+
+    <div data-role="page" id="start">
       <div data-role="header" data-position="fixed">
         <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a>
         <h2>Chat?<span id="otheruser"></span></h2>

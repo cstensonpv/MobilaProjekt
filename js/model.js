@@ -24,7 +24,7 @@
     	uuid : UUID
   });
   var userId = UUID//pubnub.uuid();
-  var users =[];
+  var users = [];
   var activeChannels = ['moo']
 
   setInterval(getLocation(), 1000);//kanske kan vara lite längre?
@@ -66,8 +66,8 @@
   function unsubAll() {
   	for(var x in activeChannels){
   		pubnub.unsubscribe({'channel': activeChannels[x]})
-  		activeChannels = [];//Borde ligga efter forloopen va?
   	}
+  activeChannels = [];
   }
 
   function requestChat(){
@@ -158,6 +158,7 @@
   	//console.log(geohashChannel);
   }
 
+//detta borde ske i ctrl
   function printMsg(id, msg, name){
     return '<div id='+id+'>' + msg+" : "+name+'</div>';
   }
