@@ -1,12 +1,19 @@
 //Model
 
-//var model = function () {
- 
-  var usrLat;
-  var usrLng;
-  var observers = [];
-  var chatPartner = "hejsan"; //Reserverad för den person som man chattar med aktuellt
-  var chatRoom; //Det rum två chattande personer är i
+var Model = function () {
+
+  var model = this;
+  this.usrLatLng = "falsk frukt";
+  this.state = 0;
+
+  // 0 - waitingRoom
+  // 1 - sent REQ redan här borde användarna unsubba från waiting och gå in i ett privat rum ^^
+  
+  this.observers = [];
+  this.mate = {id : null, pos : null, name : null}; //man borde ha ett eget sådant här obj också
+  model.chatRoom; //Det rum två chattande personer är i
+  // this.matePos = null;
+  // this.mateID = null;
 
 
   //Get UUID from user and specify PubNub keys
@@ -18,92 +25,135 @@
   })();
 
 
-  var pubnub = PUBNUB.init({
+  var pubnub = this.pubnub = PUBNUB.init({
     	publish_key   : "pub-c-7fd548b4-2815-463d-9c1c-5187d45d49f5",
     	subscribe_key : "sub-c-bea78536-e9a9-11e4-91d3-0619f8945a4f",
     	uuid : UUID
   });
   var userId = UUID//pubnub.uuid();
   var users = [];
-  var activeChannels = ['moo']
+  model.activeChannels = ['moo'];
 
-  setInterval(getLocation(), 1000);//kanske kan vara lite längre?
+  
   console.log(userId);
 
+  this.addObserver = function(obs){
+    this.observers.push(obs);
+  }
 
-  function waitingRoom(){
+  this.notifyObservers = function(code){
+    for (var i in this.observers){
+      this.observers[i].update(code);
+    }
+  }
+
+  this.waitingRoom = function(){
   	// unsubscribe
   	//subscribe till det allmänna för gällande geo hash samt de intillliggande
   	//dvs subscrive till lat:long , lat+1:long, lat-1:long, lat:long+1 osv
   	//bevaka public channel
   	//for(var i in geoHash){}
-  	unsubAll();
-  	activeChannels.push("waitingRoom"); //byt med geo
+  	this.unsubAll();
+  	model.activeChannels.push("waitingRoom"); //byt med geo
   	pubnub.subscribe({
       	'channel'   : 'waitingRoom', //byt ut sedan
       	'callback'  : function(msg) {
       		
-          	if (userId === msg.reciever || userId === msg.sender){
+          	if (userId === msg.reciever){
           		console.log(msg);
-            		if(msg.mtype==="RES") {
-            			console.log('response detected');//notifyObservers(); //enterChat(msg.sender ,userId);
+            		if(msg.mtype==="REQ"){
+                  console.log('Request detected');//notifyObservers(); //respondToRequest(msg.sender);
+                  model.mate.pos = new google.maps.LatLng(msg.pos.A,msg.pos.F);
+                  model.mate.id = msg.sender;
+                  givePosition(msg.sender);
+                  model.notifyObservers(['updateMatePos','requestPrompt']);
             		}
-            		else if(msg.mtype==="REQ"){
-            			console.log('Request detected');//notifyObservers(); //respondToRequest(msg.sender);
+                else if(msg.mtype==="POS"){
+                  console.log('Position returned');//notifyObservers(); //respondToRequest(msg.sender);
+                  model.mate.pos = new google.maps.LatLng(msg.pos.A,msg.pos.F);
+                  model.notifyObservers(['updateMatePos']);
+                }
+            		else if(msg.mtype==="RES") {
+                  console.log('response detected');//notifyObservers(); //
+                  model.enterChat(msg.sender ,userId);
+                  //notifyObservers('');
             		}
             		else if(msg.mtype === "DEN"){
             			console.log('Denial detected');//notifyObservers(); //sök efter ny partner?
+                  model.mate.pos = null;
+                  model.notifyObservers(['updateMatePos']);
             		}
           	}
       	},
       	presence: function(m){
-      		console.log(m);
-      		users.push(m.uuid);
+          if (m.action === "join"){
+      		  users.push(m.uuid);
+          }else if (m.action === "timeout" || m.action === "leave"){
+            users.splice(users.indexOf(m.uuid),1);
+          }
       	}
     	});
   }
 
-  function unsubAll() {
-  	for(var x in activeChannels){
-  		pubnub.unsubscribe({'channel': activeChannels[x]})
+  this.unsubAll = function() {
+  	for(var x in model.activeChannels){
+  		pubnub.unsubscribe({'channel': model.activeChannels[x]})
   	}
-  activeChannels = [];
+  model.activeChannels = [];
   }
 
-  function requestChat(){
+  this.requestChat = function(){
   	//slumpa någon ur waitingRoom och skicka en request
     if (users.length > 1) { //Om det finns andra att chatta med än en själv
-    	var chatPartner = randomElement(users); //Väljer en random chatpartner
+    	var chatPartner = this.randomElement(users); //Väljer en random chatpartner
     	pubnub.publish({
         'channel' : 'waitingRoom',
-        'message' : {"mtype": "REQ", "sender":userId, "reciever":chatPartner}
+        'message' : {"mtype": "REQ", "sender":userId, "reciever":chatPartner, 'pos' : model.usrLatLng}
     	});
+      model.state = 1;
+      model.mate.id = chatPartner;
     }
     else {
       alert("There are no available partners in this area, please move.");
     }
   }
 
-  function acceptRequest(initiator){
+  var givePosition = function(initiator){
+    //slumpad användare blir tillfrågad
+    //skicka bekräftelse tillbaka
+    console.log(model.usrLatLng);
+    pubnub.publish({
+          'channel' : 'waitingRoom',
+          'message' : {"mtype": "POS", "sender":userId, "reciever":initiator, 'pos' : model.usrLatLng}
+      });
+  }
+
+
+  this.acceptRequest = function(){
   	//slumpad användare blir tillfrågad
   	//skicka bekräftelse tillbaka
   	pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "RES", "sender":userId, "reciever":initiator}
+          'message' : {"mtype": "RES", "sender":userId, "reciever":model.mate.id}
     	});
-    	enterChat(userId, initiator);
+    	model.enterChat(userId, model.mate.id);
   }
 
-  function denyRequest(initiator){
+  this.denyRequest = function(){
   	//slumpad användare blir tillfrågad
   	//skicka bekräftelse tillbaka
+    console.log("model deny " + model.mate.id);
   	pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "DEN", "sender":userId, "reciever":initiator}
+          'message' : {"mtype": "DEN", "sender":userId, "reciever":model.mate.id}
     	});
+    model.mate.id = null;
+    model.mate.pos = null;
+    model.mate.name = null;
+    model.notifyObservers(['updateMatePos'])
   }
 
-  function randomElement() {
+  this.randomElement = function() {
   	//Randomizes users array and selects a random element
   	var array = users;
   	for (var id in array) {
@@ -116,24 +166,28 @@
     	return item; //selects a random element
   }
 
-  function enterChat(uuidA,uuidB) {
+  this.enterChat = function(uuidA,uuidB) {
   	//Unsub från public channels
   	//sub to unique (uuidA+UUidB)
-  	unsubAll();
-    pubnub.subscribe({
-      'channel'   : uuidA+''+uuidB,
-      'callback'  : function(msg) {
-        if (msg.sender === userId) {
-          $("#output").append(printMsg("sentMsg", msg.contents, msg.sender)); //senare ska vi skicka namn istället för msg.sender
-        }
-        else {
-          $("#output").append(printMsg("recievedMsg", msg.contents, msg.reciever));
-        }
-      }
-    });
+  	model.unsubAll();
+    // pubnub.subscribe({
+    //   'channel'   : uuidA+':'+uuidB,
+    //   'callback'  : function(msg) {
+    //     if (msg.sender === userId) {
+    //       $("#output").append(printMsg("sentMsg", msg.contents, msg.sender)); //senare ska vi skicka namn istället för msg.sender
+    //     }
+    //     else {
+    //       $("#output").append(printMsg("recievedMsg", msg.contents, msg.reciever));
+    //     }
+    //   }
+    // });
+    model.activeChannels.push(uuidA+':'+uuidB);
+    window.location = "#chat";
+    model.notifyObservers(["enterChat"]);
+    console.log(uuidA+':'+uuidB);
   }
 
-  function leaveChat() {
+  this.leaveChat = function() {
     pubnub.unsubscribe({
       'channel' : chatRoom //unsubscribear en från aktuellt chatrum
     })
@@ -142,133 +196,31 @@
 
   }
 
-  function getLocation() { //tar fram koordinater
-    	if (navigator.geolocation) {
-        	navigator.geolocation.getCurrentPosition(getCoord);
+  this.getLocation = function(callback) { //tar fram koordinater
+    	 if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          model.usrLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
+          callback(model.usrLatLng);
+        });
     	}
     	else { 
         	console.log("Geolocation is not supported by this browser.");
     	}
   }
 
-  function getCoord(position) { //Callback-funktion som hanterar
-  	usrLat = position.coords.latitude; //Fullösning att göra dessa publika?
-  	usrLng = position.coords.longitude;
-  	//geohashChannel = geohash(position.coords.latitude,2) + '' + geohash(position.coords.longitude,2); //Geohashar området till en kanal
-  	//console.log(geohashChannel);
-  }
 
 //detta borde ske i ctrl
-  function printMsg(id, msg, name){
-    return '<div id='+id+'>' + msg+" : "+name+'</div>';
-  }
+  // this.printMsg = function(id, msg, name){
+  //   return '<div id='+id+'>' + msg+" : "+name+'</div>';
+  // }
 
-  function sendMsg (contents) {
-    pubnub.publish({
-      'channel' : chatRoom,
-      'message' : {"contents" : contents, "sender" : userId, "reciever" : chatPartner}
-    });
-  }
-
-//}
-/*
-
-function subscribe(channel){
-  pubnub.subscribe({
-    'channel'   : channel,
-    'callback'  : function(message) {
-    //  if(heading == message.heading){
-        if (message.id == id){
-          var user = "Me";
-          var msgType = "myMsg"
-        }else{
-          var user = message.user;
-          var msgType = "theirMsg"
-        }
-        output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + message.timestamp + "):<br/>" + message.msg + '</div>');
-        output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
-    //  }
-    },
-    presence: function(m){
-    	users=m.uuids;
-    }
-  });
+  // this.sendMsg = function(contents) {
+  //   pubnub.publish({
+  //     'channel' : chatRoom,
+  //     'message' : {"contents" : contents, "sender" : userId, "reciever" : chatPartner}
+  //   });
+  // }
+//kanske kan vara lite längre?
+  this.waitingRoom()
+  
 }
-
-
-// send messages
-buttonSend.on('click', function() {
-  var timestamp = new Date();
-  timestamp = ((timestamp.getHours() < 10)? "0":"") + timestamp.getHours() + ":" + ((timestamp.getMinutes() < 10)? "0":"") + timestamp.getMinutes();
-
-  pubnub.publish({
-    'channel' : channel,
-    'message' : {"msg": msg.val(), "heading":heading, "user":user, "timestamp":timestamp, "id":id}
-  });
-  msg.val("");
-});
-
-// check history
-buttonHistory.on('click', function() {
-  getHistory();
-});
-
-
-function getHistory(){
-  output.html("");
-  pubnub.history({
-    count : 100,
-    channel : channel,
-    callback : function (message) {
-      for(var x in message[0]){
-    //    if(message[0][x].heading == heading){
-          if (message[0][x].id == id){
-            var user = "Me";
-            var msgType = "myMsg"
-          }else{
-            var user = message[0][x].user;
-            var msgType = "theirMsg"
-          }
-          output.html(output.html() + '<div class="' + msgType + '"><b> Sir ' + user +" </b>(" + message[0][x].timestamp + "):<br/>" + message[0][x].msg + '</div>');
-      //  }
-      }
-    }
-  });
-  output.animate({scrollTop: output[0].scrollHeight - output.height()}, 0);
-}
-
-
-
-//Location services
-
-function geohash( coord, resolution ) {
-var rez = Math.pow( 10, resolution || 0 );
-return Math.floor(coord * rez) / rez;
-}
-
-
-
-function getLocation() { //tar fram koordinater
-  	if (navigator.geolocation) {
-      	navigator.geolocation.getCurrentPosition(getCoord);
-  	}
-  	else { 
-      	console.log("Geolocation is not supported by this browser.");
-  	}
-}
-
-var mapOptions = {
-	zoom: currZoom,
-	center: new google.maps.LatLng(lat, lng),
-	//disableDefaultUI: true,
-	panControl: false,
-	zoomControl: false,
-	mapTypeControl: false,
-	scaleControl: false,
-	streetViewControl: false,
-	overviewMapControl: false,
-	draggable: false,
-	disableDoubleClickZoom: true
-}
-map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions); //fullösning att göra denna publik?
-*/

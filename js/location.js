@@ -8,7 +8,7 @@ return Math.floor(coord * rez) / rez;
 function getCoord(position) { //Callback-funktion som hanterar
 	var usrLat = position.coords.latitude; //Fullösning att göra dessa publika?
 	var usrLng = position.coords.longitude;
-	geohashChannel = geohash(position.coords.latitude,2) + '' + geohash(position.coords.longitude,2);
+	geohashChannel = geohash(position.coords.latitude,2) + '' + geohash(position.coords.longitude,2); //Geohashar området till en kanal
 	console.log(geohashChannel);
 }
 

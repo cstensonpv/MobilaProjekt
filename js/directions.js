@@ -72,28 +72,28 @@ function calcRoute(yourPos, otherPos) {
 
 function newControl(map, text) { //Funktion för diverse kontrollknappar.
 
-      // Set CSS for the control border
-      var controlDiv = document.createElement('div');
-      controlDiv.id="durationDiv"
+  // Set CSS for the control border
+  var controlDiv = document.createElement('div');
+  controlDiv.id="durationDiv"
 
-      // Set CSS for the control interior
-      var controlText = document.createElement('div');
-      controlText.id= "durationTime";
+  // Set CSS for the control interior
+  var controlText = document.createElement('div');
+  controlText.id= "durationTime";
 
-      var img = document.createElement('img');
-      img.id="durationImg";
-      img.src ="https://cdn0.iconfinder.com/data/icons/education-15/500/Student-512.png";
-      img.width = "20px";
-      controlDiv.appendChild(img);
+  var img = document.createElement('img');
+  img.id="durationImg";
+  img.src ="https://cdn0.iconfinder.com/data/icons/education-15/500/Student-512.png";
+  img.width = "20px";
+  controlDiv.appendChild(img);
 
-      controlText.innerHTML = text;
-      controlDiv.appendChild(controlText);
+  controlText.innerHTML = text;
+  controlDiv.appendChild(controlText);
 
-      // Setup the click event listeners: simply set the map to
-      // stockholm
-      google.maps.event.addDomListener(controlDiv);
-      map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
+  // Setup the click event listeners: simply set the map to
+  // stockholm
+  google.maps.event.addDomListener(controlDiv);
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
 
-    }
+}
 
 google.maps.event.addDomListener(window, 'load', initialize);
