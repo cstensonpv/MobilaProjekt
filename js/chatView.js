@@ -119,7 +119,7 @@ var ChatView = function(container, model){
           }
         output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + msg.timestamp + "):<br/>" + msg.content + '</div>');
         output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
-        chatViewCtrl.refreshController();
+        //chatViewCtrl.refreshController();
       },
       presence: function(m){
         //join och leave meddelande
@@ -131,6 +131,7 @@ var ChatView = function(container, model){
            output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has joined the chat</div>');
         }
         console.log(m);
+        //chatViewCtrl.refreshController();
       }
     });
     initialize();

@@ -19,17 +19,17 @@ var ChatViewCtrl = function(view,model){
 		model.notifyObservers(["updateMatePos"]);
 		model.waitingRoom();
 		window.location = '#waitingRoom';
-		$("#chatOutput").html = "";
+		$("#chatOutput").html("");
 	});
 
 	//this is fine...
-	this.refreshController = function(){
-		console.log("refreshing controller")
-		$("#btnChat").click(function(){
-			console.log("send msg: " + $("#txtChat").val());
-			model.sendMsg($("#txtChat").val());
-			$("#txtChat").val('');
-		});
-	}
+	// this.refreshController = function(){
+	// 	console.log("refreshing controller")
+	// 	$("#btnChat").click(function(){
+	// 		console.log("send msg: " + $("#txtChat").val());
+	// 		model.sendMsg($("#txtChat").val());
+	// 		$("#txtChat").val('');
+	// 	});
+	// }
 
 }
