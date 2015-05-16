@@ -53,7 +53,7 @@ var WaitingRoomView = function(container,model){
 			console.log("set mate pos");
 			console.log(wMap);
 			console.log(model.mate.pos);
-			console.log(model.usrLatLng)
+			console.log(model.my.pos)
 		    mateLocation = new google.maps.Marker({
 			    clickable: false,
 			    icon: new google.maps.MarkerImage('http://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Red_pog.svg/64px-Red_pog.svg.png',

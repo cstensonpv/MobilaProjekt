@@ -12,7 +12,7 @@ var ChatView = function(container, model){
     var stockholm = new google.maps.LatLng(59.3275, 18.0675);
     var mapOptions = {
       zoom:2,
-      center: stockholm,
+      center: model.my.pos,
       disableDefaultUI: true
     };
     var mapDiv = document.getElementById("map-directions");
@@ -23,7 +23,7 @@ var ChatView = function(container, model){
     newControl(dMap,'');
     mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
     chatOutput.style.height = (window.innerHeight*0.83).toFixed(0)-44.375 + 'px'; // 44.375 är höjden på headern i iPhone 5.
-    calcRoute(model.usrLatLng,model.mate.pos);
+    calcRoute();
     google.maps.event.trigger(dMap, 'resize');
   }
 
@@ -38,7 +38,7 @@ var ChatView = function(container, model){
       map.animate({height : bigMapHeight},200,'swing',function(){ // när animationen är klar, gör detta:
         $('#chatOutput').hide();
         $('#closeMap').show();
-        calcRoute(model.usrLatLng,model.mate.pos);
+        calcRoute();
         google.maps.event.trigger(dMap, 'resize'); //uppdaterar rendrering på kartan. Resizar kartan för fönsterstorleken.
       });
     }
@@ -52,26 +52,28 @@ var ChatView = function(container, model){
 
     map.animate({height : smallMapHeight},200,'swing',function(){
       $('#closeMap').hide();
-      //calcRoute("karlaplan,stockholm","odenplan,stockholm");
+      calcRoute();
       google.maps.event.trigger(dMap, 'resize');
     });
     $('#chatOutput').show();
   }
 
-  var calcRoute = function(yourPos, otherPos) {
-    var request = {
-        origin:yourPos,
-        destination:otherPos,
-        travelMode: google.maps.TravelMode.WALKING
-    };
-    directionsService.route(request, function(response, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplay.setDirections(response);
-        document.getElementById("durationTime").innerHTML = response.routes[0].legs[0].duration.text;
-      }else if(status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
-        alert("API anrop slut!");
+  var calcRoute = function() {
+    if(model.my.pos && model.mate.pos){
+      var request = {
+          origin:model.my.pos,
+          destination:model.mate.pos,
+          travelMode: google.maps.TravelMode.WALKING
       };
-    });
+      directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(response);
+          document.getElementById("durationTime").innerHTML = response.routes[0].legs[0].duration.text;
+        }else if(status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
+          alert("API anrop slut!");
+        };
+      });
+    }
   };
 
   var newControl = function(map, text) { //Funktion för diverse kontrollknappar.
