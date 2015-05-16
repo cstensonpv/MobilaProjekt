@@ -17,7 +17,7 @@ var ChatViewCtrl = function(view,model){
 	view.btnLeave.click(function(){
 		model.mate = {id : null, pos : null, name : null};
 		model.notifyObservers(["updateMatePos"]);
-		model.waitingRoom();
+		model.getLocation( model.geohash );
 		window.location = '#waitingRoom';
 		$("#chatOutput").html("");
 	});
