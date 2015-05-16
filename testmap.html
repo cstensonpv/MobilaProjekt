@@ -52,7 +52,7 @@
 		    }
 		}
 
-		function addMarker(image, LatLng, content){
+		function addMarker(image, LatLng, content){ // skapar en ny marker och om content finns med ett info
 			console.log("adds marker "+content);
 			var newMarker = new google.maps.Marker({
 				map:Gmap,
@@ -61,13 +61,15 @@
 				position: LatLng,
 				icon: image 
 			})
-			var infowindow = new google.maps.InfoWindow({
-			      content: content
-			  });
-			google.maps.event.addListener(newMarker, 'click', function() {
-			    infowindow.open(map,newMarker);
-			  });
-			  return newMarker;			
+			if(content){
+				var infowindow = new google.maps.InfoWindow({
+				      content: content
+				  });
+				google.maps.event.addListener(newMarker, 'click', function() {
+				    infowindow.open(map,newMarker);
+				  });
+			}
+			return newMarker;			
 		}
 
 		function changeMarkerPosition(marker,newLatLng){
