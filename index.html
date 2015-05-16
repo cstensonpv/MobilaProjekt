@@ -39,6 +39,8 @@
     <script src="js/waitingRoomViewCtrl.js"></script>
     <script src="js/chatViewCtrl.js"></script>    
     <script src="js/chatView.js"></script>
+    <script src="js/profileView.js"></script>
+    <script src="js/profileCtrl.js"></script>
 
 
     
@@ -108,7 +110,25 @@
     </script>
   </head>
 
-  <body>
+  <body id="body">
+    <div data-role="page" id="profile">
+      <div data-role="header" data-position="fixed" id="header">
+        <h2>Profile</h2>
+      </div>
+      <p>Enter your name: </p>
+      <input id="inputName" placeholder="Enter profile name here"></input>
+      <button id="sendName">Done!</button>
+      <p>Select image: </p>
+      <input id="selectPic" type="file" accept="image/*"/>
+      <video id="video" width="640" height="480" autoplay></video>
+      <canvas id="capturedPhoto" width="500" height="400">
+      </canvas>
+
+      <!-- Tror inte vi ska ha input message i en footer. Det verkar vara svårt att style skit i en jQuery footer -->
+      <div data-role="footer" data-position="fixed" class="ui-field-contain" data-theme="a">
+        <button id="btnDeny" data-theme="b" style="width:50%">Deny</button><button id="btnAccept" data-theme="a" style="width:50%">Accept</button>          
+      </div>
+    </div>
 
 
     <div data-role="page" id="waitingRoom">
