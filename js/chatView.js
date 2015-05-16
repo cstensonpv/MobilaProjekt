@@ -4,6 +4,8 @@ var ChatView = function(container, model){
   var dMap;
   this.shrinkMap = $('#closeMap');
   this.expandMap = $('#dMap');
+  this.txtChat = $('#txtChat');
+  this.btnChat = $('#btnChat');
 
   model.addObserver(this);
 
@@ -104,26 +106,25 @@ var ChatView = function(container, model){
     var output = $("#chatOutput");
     model.pubnub.subscribe({
       'channel'   : model.activeChannels[0],
-      'callback'  : function(message) {
-      //  if(heading == message.heading){
-          // if (message.id == id){
-          //   var user = "Me";
-          //   var msgType = "myMsg"
-          // }else{
-            var user = message.user;
-            var msgType = "theirMsg"
-          // }
-          output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + message.timestamp + "):<br/>" + message.msg + '</div>');
+      'callback'  : function(msg) {
+            if (msg.sender.id === model.my.id){
+              var user = "Me";
+              var msgType = "myMsg";
+            }else{
+              var user = msg.sender.name;
+              var msgType = "theirMsg";
+            }
+          output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + msg.timestamp + "):<br/>" + msg.msg + '</div>');
           output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
-      //  }
       },
       presence: function(m){
+        //join och leave meddelande
         console.log(m);
       }
     });
   }
   initialize();
-  //google.maps.event.addDomListener(window, 'load', initialize);
+
 
   this.update = function(code){
     console.log("update view");

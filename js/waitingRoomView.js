@@ -1,4 +1,4 @@
-var WaitingRoomView = function(container,model){
+var WaitingRoomView = function(container,model,shakeCtrl){
 	//this.randomButton = container.find("#randomButton");
 	var wMapDiv = this.wMapDiv = $("#myMapPosition")[0];
 	this.randomButton = $("#randomButton");
@@ -90,5 +90,5 @@ var WaitingRoomView = function(container,model){
 	model.addObserver(this);
 	initialize();
 	console.log(this.randomButton);
-	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model);
+	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model,shakeCtrl);
 }

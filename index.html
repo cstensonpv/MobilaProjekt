@@ -33,10 +33,13 @@
 
     <script src="js/app.js"></script>
     <script src="js/model.js"></script>
+    <script src="shake/shake.js"></script>
+    <script src="js/shakeCtrl.js"></script>
     <script src="js/waitingRoomView.js"></script>
     <script src="js/waitingRoomViewCtrl.js"></script>
-    <script src="js/chatView.js"></script>
     <script src="js/chatViewCtrl.js"></script>    
+    <script src="js/chatView.js"></script>
+
 
     
     <style type="text/css">
@@ -125,7 +128,7 @@
         <div id="chatOutput">
           
           <div style="width:80%;margin:auto;bottom:0;left:0;right:0;position:fixed;">
-            <input placeholder="Skriv något najs här!"></input>
+            <input id="txtChat"placeholder="Skriv något najs här!"></input><button id="btnChat">Send</button>
           </div>
         </div>
 

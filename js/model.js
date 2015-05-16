@@ -155,13 +155,9 @@ var Model = function () {
 
   this.randomElement = function() {
   	//Randomizes users array and selects a random element
+    console.log(users);
   	var array = users;
-  	for (var id in array) {
-  		if (array[id] === userId){
-  			array.splice(id,1);
-  			break;
-  		}
-  	}
+  	array.splice(array.indexOf(userId,1))
   	var item = array[Math.floor(Math.random()*array.length)];
     	return item; //selects a random element
   }
@@ -214,12 +210,12 @@ var Model = function () {
   //   return '<div id='+id+'>' + msg+" : "+name+'</div>';
   // }
 
-  // this.sendMsg = function(contents) {
-  //   pubnub.publish({
-  //     'channel' : chatRoom,
-  //     'message' : {"contents" : contents, "sender" : userId, "reciever" : chatPartner}
-  //   });
-  // }
+  this.sendMsg = function(content) {
+    pubnub.publish({
+      'channel' : model.activeChannels[0],
+      'message' : {"mtype": "DEN", "sender": model.my, "reciever":model.mate, "content":content}
+    });
+  }
 //kanske kan vara lite längre?
   this.waitingRoom()
   
