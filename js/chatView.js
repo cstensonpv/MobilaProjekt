@@ -3,7 +3,10 @@ var ChatView = function(container, model){
   var directionsService = new google.maps.DirectionsService();
   var dMap;
   this.shrinkMap = $('#closeMap');
-  this.expandMap = $('#dMap');
+  this.expandMap = $('#map-directions');
+  this.txtChat = $('#txtChat');
+  this.btnChat = $('#btnChat');
+  this.btnLeave = $('#btnLeaveChat');
 
   model.addObserver(this);
 
@@ -12,18 +15,18 @@ var ChatView = function(container, model){
     var stockholm = new google.maps.LatLng(59.3275, 18.0675);
     var mapOptions = {
       zoom:2,
-      center: stockholm,
+      center: model.my.pos,
       disableDefaultUI: true
     };
     var mapDiv = document.getElementById("map-directions");
     var chatOutput = document.getElementById("chatOutput");
     dMap = new google.maps.Map(mapDiv, mapOptions);
     directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.setMap(dMap);
     newControl(dMap,'');
     mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
     chatOutput.style.height = (window.innerHeight*0.83).toFixed(0)-44.375 + 'px'; // 44.375 är höjden på headern i iPhone 5.
-    calcRoute(model.usrLatLng,model.mate.pos);
+    calcRoute();
+    directionsDisplay.setMap(dMap);
     google.maps.event.trigger(dMap, 'resize');
   }
 
@@ -36,9 +39,9 @@ var ChatView = function(container, model){
     if(map.css('height') == smallMapHeight){
       console.log("Expanding map");
       map.animate({height : bigMapHeight},200,'swing',function(){ // när animationen är klar, gör detta:
-        $('#chatOutput').hide();
+        $('#chatDiv').hide();
         $('#closeMap').show();
-        calcRoute(model.usrLatLng,model.mate.pos);
+        calcRoute();
         google.maps.event.trigger(dMap, 'resize'); //uppdaterar rendrering på kartan. Resizar kartan för fönsterstorleken.
       });
     }
@@ -52,26 +55,28 @@ var ChatView = function(container, model){
 
     map.animate({height : smallMapHeight},200,'swing',function(){
       $('#closeMap').hide();
-      //calcRoute("karlaplan,stockholm","odenplan,stockholm");
+      calcRoute();
       google.maps.event.trigger(dMap, 'resize');
     });
-    $('#chatOutput').show();
+    $('#chatDiv').show();
   }
 
-  var calcRoute = function(yourPos, otherPos) {
-    var request = {
-        origin:yourPos,
-        destination:otherPos,
-        travelMode: google.maps.TravelMode.WALKING
-    };
-    directionsService.route(request, function(response, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplay.setDirections(response);
-        document.getElementById("durationTime").innerHTML = response.routes[0].legs[0].duration.text;
-      }else if(status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
-        alert("API anrop slut!");
+  var calcRoute = function() {
+    if(model.my.pos && model.mate.pos){
+      var request = {
+          origin:model.my.pos,
+          destination:model.mate.pos,
+          travelMode: google.maps.TravelMode.WALKING
       };
-    });
+      directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(response);
+          document.getElementById("durationTime").innerHTML = response.routes[0].legs[0].duration.text;
+        }else if(status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT){
+          alert("API anrop slut!");
+        };
+      });
+    }
   };
 
   var newControl = function(map, text) { //Funktion för diverse kontrollknappar.
@@ -104,26 +109,33 @@ var ChatView = function(container, model){
     var output = $("#chatOutput");
     model.pubnub.subscribe({
       'channel'   : model.activeChannels[0],
-      'callback'  : function(message) {
-      //  if(heading == message.heading){
-          // if (message.id == id){
-          //   var user = "Me";
-          //   var msgType = "myMsg"
-          // }else{
-            var user = message.user;
-            var msgType = "theirMsg"
-          // }
-          output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + message.timestamp + "):<br/>" + message.msg + '</div>');
-          output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
-      //  }
+      'callback'  : function(msg) {
+          if (msg.sender.id === model.my.id){
+            var user = "Me";
+            var msgType = "myMsg";
+          }else{
+            var user = msg.sender.name;
+            var msgType = "theirMsg";
+          }
+        output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + msg.timestamp + "):<br/>" + msg.content + '</div>');
+        output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
+        //chatViewCtrl.refreshController();
       },
       presence: function(m){
+        //join och leave meddelande
+        if(m.action == "leave"){
+          output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has left the chat</div>');
+          model.mate = {id : null, pos : null, name : null};
+          model.notifyObservers("updateMatePos");
+        }else if(m.action == "join" && m.uuid != model.my.id){
+           output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has joined the chat</div>');
+        }
         console.log(m);
+        //chatViewCtrl.refreshController();
       }
     });
+    initialize();
   }
-  initialize();
-  //google.maps.event.addDomListener(window, 'load', initialize);
 
   this.update = function(code){
     console.log("update view");

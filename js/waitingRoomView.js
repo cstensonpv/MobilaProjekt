@@ -1,10 +1,11 @@
-var WaitingRoomView = function(container,model){
+var WaitingRoomView = function(container,model,shakeCtrl){
 	//this.randomButton = container.find("#randomButton");
 	var wMapDiv = this.wMapDiv = $("#myMapPosition")[0];
 	this.randomButton = $("#randomButton");
 	this.btnDeny = $("#btnDeny");
 	this.btnAccept = $("#btnAccept");
 	this.header = $("#header");
+
 	console.log(this.header.height());
 	var mateLocation = null;
 	var wMap;
@@ -38,22 +39,21 @@ var WaitingRoomView = function(container,model){
 	    	myLocation.setPosition(pos);
 	    }
 	    setInterval(function(){
-	    	console.log("getlocation");
 	    	model.getLocation(updateMyLocation);
 	    }, 200);
 	    wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px'//(window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
 	}
 
 	var setMatePos = function(){
-		if(mateLocation != null){
+		if(mateLocation != null || (mateLocation != null && model.mate.pos == null)){
+			console.log("remove marker");
 			mateLocation.setMap(null);
-
 		}
 		if(model.mate.pos != null){
 			console.log("set mate pos");
 			console.log(wMap);
 			console.log(model.mate.pos);
-			console.log(model.usrLatLng)
+			console.log(model.my.pos)
 		    mateLocation = new google.maps.Marker({
 			    clickable: false,
 			    icon: new google.maps.MarkerImage('http://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Red_pog.svg/64px-Red_pog.svg.png',
@@ -89,6 +89,5 @@ var WaitingRoomView = function(container,model){
 
 	model.addObserver(this);
 	initialize();
-	console.log(this.randomButton);
-	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model);
+	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model,shakeCtrl);
 }

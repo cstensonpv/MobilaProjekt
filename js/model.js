@@ -3,18 +3,18 @@
 var Model = function () {
 
   var model = this;
-  this.usrLatLng = "falsk frukt";
+  //this.usrLatLng = "falsk frukt";
   this.state = 0;
 
   // 0 - waitingRoom
   // 1 - sent REQ redan här borde användarna unsubba från waiting och gå in i ett privat rum ^^
   
   this.observers = [];
+  this.my = {id : null, pos : null, name : "Me!!"};
   this.mate = {id : null, pos : null, name : null}; //man borde ha ett eget sådant här obj också
-  model.chatRoom; //Det rum två chattande personer är i
-  // this.matePos = null;
-  // this.mateID = null;
-
+  this.chatRoom; //Det rum två chattande personer är i
+  this.users = [];
+  this.activeChannels = [];
 
   //Get UUID from user and specify PubNub keys
   var UUID = PUBNUB.db.get('session') || (function(){ 
@@ -30,85 +30,105 @@ var Model = function () {
     	subscribe_key : "sub-c-bea78536-e9a9-11e4-91d3-0619f8945a4f",
     	uuid : UUID
   });
-  var userId = UUID//pubnub.uuid();
-  var users = [];
-  model.activeChannels = ['moo'];
-
-  
-  console.log(userId);
+  this.my.id = UUID//pubnub.uuid();
 
   this.addObserver = function(obs){
-    this.observers.push(obs);
+    model.observers.push(obs);
   }
 
   this.notifyObservers = function(code){
     for (var i in this.observers){
-      this.observers[i].update(code);
+      model.observers[i].update(code);
     }
   }
 
-  this.waitingRoom = function(){
+  this.subscribe = function(){
   	// unsubscribe
   	//subscribe till det allmänna för gällande geo hash samt de intillliggande
   	//dvs subscrive till lat:long , lat+1:long, lat-1:long, lat:long+1 osv
   	//bevaka public channel
   	//for(var i in geoHash){}
-  	this.unsubAll();
-  	model.activeChannels.push("waitingRoom"); //byt med geo
+  	//model.unsubAll();
+  	//model.activeChannels.push("waitingRoom"); //byt med geo
   	pubnub.subscribe({
-      	'channel'   : 'waitingRoom', //byt ut sedan
-      	'callback'  : function(msg) {
-      		
-          	if (userId === msg.reciever){
-          		console.log(msg);
-            		if(msg.mtype==="REQ"){
-                  console.log('Request detected');//notifyObservers(); //respondToRequest(msg.sender);
-                  model.mate.pos = new google.maps.LatLng(msg.pos.A,msg.pos.F);
-                  model.mate.id = msg.sender;
-                  givePosition(msg.sender);
-                  model.notifyObservers(['updateMatePos','requestPrompt']);
-            		}
-                else if(msg.mtype==="POS"){
-                  console.log('Position returned');//notifyObservers(); //respondToRequest(msg.sender);
-                  model.mate.pos = new google.maps.LatLng(msg.pos.A,msg.pos.F);
-                  model.notifyObservers(['updateMatePos']);
-                }
-            		else if(msg.mtype==="RES") {
-                  console.log('response detected');//notifyObservers(); //
-                  model.enterChat(msg.sender ,userId);
-                  //notifyObservers('');
-            		}
-            		else if(msg.mtype === "DEN"){
-            			console.log('Denial detected');//notifyObservers(); //sök efter ny partner?
-                  model.mate.pos = null;
-                  model.notifyObservers(['updateMatePos']);
-            		}
-          	}
-      	},
-      	presence: function(m){
-          if (m.action === "join"){
-      		  users.push(m.uuid);
-          }else if (m.action === "timeout" || m.action === "leave"){
-            users.splice(users.indexOf(m.uuid),1);
+    	'channel'   : model.activeChannels, //byt ut sedan
+    	'callback'  : function(msg) {
+    		
+      	if (model.my.id == msg.reciever){
+      		console.log(msg);
+      		if(msg.mtype==="REQ"){
+            console.log('Request detected');//notifyObservers(); //respondToRequest(msg.sender);
+            model.mate = msg.sender;
+            model.mate.pos = new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
+            givePosition(msg.sender.id);
+            model.notifyObservers(['updateMatePos','requestPrompt']);
+      		}
+          else if(msg.mtype==="POS"){
+            console.log('Position returned');//notifyObservers(); //respondToRequest(msg.sender);
+            model.mate = msg.sender;
+            model.mate.pos = new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
+            model.notifyObservers(['updateMatePos']);
           }
+      		else if(msg.mtype==="RES") {
+            console.log('response detected');//notifyObservers(); //
+            model.enterChat(msg.sender.id,model.my.id);
+            //notifyObservers('');
+      		}
+      		else if(msg.mtype === "DEN"){
+      			console.log('Denial detected');//notifyObservers(); //sök efter ny partner?
+            model.mate.pos = null;
+            model.notifyObservers(['updateMatePos']);
+      		}
       	}
-    	});
+    	},
+    	presence: function(m){
+        if (m.action === "join" && model.users.indexOf(m.uuid) === -1){
+    		  model.users.push(m.uuid);
+          console.log("pushat i presence! "+ m.uuid);
+        }else if (m.action === "timeout" || m.action === "leave"){
+          console.log(m.action);
+          if(model.users.indexOf(m.uuid) != -1){
+            console.log('splicar i presence! ' + m.uuid)
+            model.users.splice(model.users.indexOf(m.uuid),1);
+          }
+        }
+    	}
+    });
+    hereNow();
+  }
+
+  var hereNow = function(){
+    for(var closeChannel in model.activeChannels){
+      pubnub.here_now({
+        channel: model.activeChannels[closeChannel],
+        callback: function(m){
+          for(var user in m.uuids){
+            if(model.users.indexOf(m.uuids[user]) === -1){
+              console.log('pushar user i here_now!');
+              model.users.push(m.uuids[user]);
+            } 
+          }
+        }
+      });
+    }
   }
 
   this.unsubAll = function() {
   	for(var x in model.activeChannels){
-  		pubnub.unsubscribe({'channel': model.activeChannels[x]})
+  		model.unsubscribe(model.activeChannels[x]);
   	}
-  model.activeChannels = [];
+    model.activeChannels =[];
   }
 
   this.requestChat = function(){
   	//slumpa någon ur waitingRoom och skicka en request
-    if (users.length > 1) { //Om det finns andra att chatta med än en själv
-    	var chatPartner = this.randomElement(users); //Väljer en random chatpartner
-    	pubnub.publish({
-        'channel' : 'waitingRoom',
-        'message' : {"mtype": "REQ", "sender":userId, "reciever":chatPartner, 'pos' : model.usrLatLng}
+    if (model.users.length > 1) { //Om det finns andra att chatta med än en själv
+    	var chatPartner = model.randomElement(model.users); //Väljer en random chatpartner
+    	console.log(chatPartner);
+      console.log(model.my.id);
+      pubnub.publish({
+        'channel' : model.chatRoom,
+        'message' : {"mtype": "REQ", "sender": model.my, "reciever":chatPartner}
     	});
       model.state = 1;
       model.mate.id = chatPartner;
@@ -121,10 +141,10 @@ var Model = function () {
   var givePosition = function(initiator){
     //slumpad användare blir tillfrågad
     //skicka bekräftelse tillbaka
-    console.log(model.usrLatLng);
+    console.log("Sending my positon");
     pubnub.publish({
-          'channel' : 'waitingRoom',
-          'message' : {"mtype": "POS", "sender":userId, "reciever":initiator, 'pos' : model.usrLatLng}
+          'channel' : model.chatRoom,
+          'message' : {"mtype": "POS", "sender": model.my, "reciever":initiator}
       });
   }
 
@@ -133,10 +153,10 @@ var Model = function () {
   	//slumpad användare blir tillfrågad
   	//skicka bekräftelse tillbaka
   	pubnub.publish({
-          'channel' : 'waitingRoom',
-          'message' : {"mtype": "RES", "sender":userId, "reciever":model.mate.id}
+          'channel' : model.chatRoom,
+          'message' : {"mtype": "RES", "sender":model.my, "reciever":model.mate.id}
     	});
-    	model.enterChat(userId, model.mate.id);
+    	model.enterChat(model.my.id, model.mate.id);
   }
 
   this.denyRequest = function(){
@@ -144,8 +164,8 @@ var Model = function () {
   	//skicka bekräftelse tillbaka
     console.log("model deny " + model.mate.id);
   	pubnub.publish({
-          'channel' : 'waitingRoom',
-          'message' : {"mtype": "DEN", "sender":userId, "reciever":model.mate.id}
+          'channel' : model.chatRoom,
+          'message' : {"mtype": "DEN", "sender":model.my, "reciever":model.mate.id}
     	});
     model.mate.id = null;
     model.mate.pos = null;
@@ -153,17 +173,15 @@ var Model = function () {
     model.notifyObservers(['updateMatePos'])
   }
 
-  this.randomElement = function() {
+  this.randomElement = function(userArray) {
   	//Randomizes users array and selects a random element
-  	var array = users;
-  	for (var id in array) {
-  		if (array[id] === userId){
-  			array.splice(id,1);
-  			break;
-  		}
-  	}
-  	var item = array[Math.floor(Math.random()*array.length)];
-    	return item; //selects a random element
+  	var lArray = $.extend(true, [], userArray); //deepc copy users
+    console.log(lArray);
+  	lArray.splice(lArray.indexOf(model.my.id),1);
+    console. log(lArray);
+  	var item = lArray[Math.floor(Math.random()*lArray.length)];
+    console.log("Request: " + item);
+    return item; //selects a random element
   }
 
   this.enterChat = function(uuidA,uuidB) {
@@ -173,7 +191,7 @@ var Model = function () {
     // pubnub.subscribe({
     //   'channel'   : uuidA+':'+uuidB,
     //   'callback'  : function(msg) {
-    //     if (msg.sender === userId) {
+    //     if (msg.sender === model.my.pos) {
     //       $("#output").append(printMsg("sentMsg", msg.contents, msg.sender)); //senare ska vi skicka namn istället för msg.sender
     //     }
     //     else {
@@ -187,20 +205,20 @@ var Model = function () {
     console.log(uuidA+':'+uuidB);
   }
 
-  this.leaveChat = function() {
-    pubnub.unsubscribe({
-      'channel' : chatRoom //unsubscribear en från aktuellt chatrum
-    })
-  	//unsub från unique/s
-  	//call waitingRoom()
+  // this.leaveChat = function() {
+  //   pubnub.unsubscribe({
+  //     'channel' : chatRoom //unsubscribear en från aktuellt chatrum
+  //   })
+  // 	//unsub från unique/s
+  // 	//call waitingRoom()
 
-  }
+  // }
 
   this.getLocation = function(callback) { //tar fram koordinater
     	 if(navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          model.usrLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
-          callback(model.usrLatLng);
+        navigator.geolocation.getCurrentPosition(function(position){
+          model.my.pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
+          callback(model.my.pos);
         });
     	}
     	else { 
@@ -214,13 +232,62 @@ var Model = function () {
   //   return '<div id='+id+'>' + msg+" : "+name+'</div>';
   // }
 
-  // this.sendMsg = function(contents) {
-  //   pubnub.publish({
-  //     'channel' : chatRoom,
-  //     'message' : {"contents" : contents, "sender" : userId, "reciever" : chatPartner}
-  //   });
-  // }
-//kanske kan vara lite längre?
-  this.waitingRoom()
+  this.sendMsg = function(content) {
+    var timestamp = new Date();
+    timestamp = ((timestamp.getHours() < 10)? "0":"") + timestamp.getHours() + ":" + ((timestamp.getMinutes() < 10)? "0":"") + timestamp.getMinutes();
+    pubnub.publish({
+      'channel' : model.activeChannels[0],
+      'message' : {"mtype": "DEN", "sender": model.my, "reciever":model.mate, "content":content, "timestamp":timestamp}
+    });
+  }
+
+  this.geohash = function( coord, resolution ) {
+    var rez = Math.pow( 10, resolution || 0 );
+    geohashLat = Math.floor(coord.A * rez);//returns an integer / rez;
+    geohashLng = Math.floor(coord.F * rez);//returns an integer / rez; 
+    subscribeChannels(geohashLat, geohashLng);
+    model.chatRoom = geohashLat+" : "+geohashLng;
+  }
+
+  var subscribeChannels = function(geohashLat, geohashLng){
+      
+    var newChannels = [];
+    var channelChanged = false;
+    console.log(model.activeChannels);
+    console.log(geohashLat);
+    for(var lat = geohashLat -1; lat <= geohashLat+1; lat++){
+      for(var lng = geohashLng -1; lng <= geohashLng+1; lng++){
+        newChannels.push(lat +" : "+ lng);
+      }
+    }
+    console.log(newChannels);
+    for(var channel = 0; channel<9; channel++){
+      if(model.activeChannels.indexOf(newChannels[channel]) === -1){
+        //ny subscribe
+        channelChanged = true;
+        model.activeChannels.push(newChannels[channel]);
+        console.log("sub: "+ newChannels[channel])
+      }
+      if(newChannels.indexOf(model.activeChannels[channel]) === -1){
+        //unsubscribe
+        //console.log(activeChannels);
+        channelChanged = true;
+        console.log("unsub: "+ model.activeChannels[channel])
+        model.unsubscribe(model.activeChannels[channel]);
+        model.activeChannels.splice(channel, 1);
+      }
+    }
+    model.subscribe();
+    console.log(model.activeChannels);
+  }
+
+  this.unsubscribe = function(channelName){
+    console.log('unsubbar från: ' + channelName)
+    pubnub.unsubscribe({
+      channel: channelName
+    });
+  }
+
+  this.getLocation( model.geohash );
   
 }
