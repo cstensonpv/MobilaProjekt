@@ -14,4 +14,22 @@ var ChatViewCtrl = function(view,model){
 		view.txtChat.val('');
 	});
 
+	view.btnLeave.click(function(){
+		model.mate = {id : null, pos : null, name : null};
+		model.notifyObservers(["updateMatePos"]);
+		model.waitingRoom();
+		window.location = '#waitingRoom';
+		$("#chatOutput").html = "";
+	});
+
+	//this is fine...
+	this.refreshController = function(){
+		console.log("refreshing controller")
+		$("#btnChat").click(function(){
+			console.log("send msg: " + $("#txtChat").val());
+			model.sendMsg($("#txtChat").val());
+			$("#txtChat").val('');
+		});
+	}
+
 }

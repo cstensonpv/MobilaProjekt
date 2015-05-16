@@ -64,6 +64,19 @@
       position: absolute;
       width: 100%;
     }
+
+    .infoMsg{
+      background-color: rgba(180,180,180,0.8);
+      max-width:60%;
+      margin-left: 20%;
+      margin.right: 20%;
+      border-radius: 20px;
+      text-align: center;
+      padding:10px;
+      margin-top:5px;
+      margin-right: 10px;
+    }
+
     .myMsg{
       background-color: rgba(180,255,180,0.8);
       max-width:80%;
@@ -116,6 +129,7 @@
 
     <div data-role="page" id="chat">
       <div id ="header" data-role="header">
+      <button id="btnLeaveChat" ata-inline="true" class="btn" style="width=10%">Leave chat</button>
         <h1>Map?</h1>
         <!-- <a href="#chat" class="ui-btn-right" position="right">Chat!</a> -->
         <a id="closeMap" href="" class="ui-btn-right" position="right" style="display:none">Close</a>

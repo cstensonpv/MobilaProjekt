@@ -1,6 +1,5 @@
 var WaitingRoomViewCtrl = function(view,model,shakeCtrl){
 	//console.log(view.randomButton);
-	console.log(shakeCtrl);
 	shakeCtrl.activateShake(function(){
 		window.navigator.vibrate(1000);
 		if (model.state == 1){
@@ -10,7 +9,7 @@ var WaitingRoomViewCtrl = function(view,model,shakeCtrl){
 		});
 
 	view.randomButton.click(function(){
-		window.navigator.vibrate(1000);
+		//window.navigator.vibrate(1000);
 		if (model.state == 1){
 			model.denyRequest()
 		} 

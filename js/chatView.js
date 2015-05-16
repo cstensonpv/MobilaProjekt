@@ -6,6 +6,7 @@ var ChatView = function(container, model){
   this.expandMap = $('#dMap');
   this.txtChat = $('#txtChat');
   this.btnChat = $('#btnChat');
+  this.btnLeave = $('#btnLeaveChat');
 
   model.addObserver(this);
 
@@ -109,24 +110,31 @@ var ChatView = function(container, model){
     model.pubnub.subscribe({
       'channel'   : model.activeChannels[0],
       'callback'  : function(msg) {
-            if (msg.sender.id === model.my.id){
-              var user = "Me";
-              var msgType = "myMsg";
-            }else{
-              var user = msg.sender.name;
-              var msgType = "theirMsg";
-            }
-          output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + msg.timestamp + "):<br/>" + msg.msg + '</div>');
-          output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
+          if (msg.sender.id === model.my.id){
+            var user = "Me";
+            var msgType = "myMsg";
+          }else{
+            var user = msg.sender.name;
+            var msgType = "theirMsg";
+          }
+        output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + msg.timestamp + "):<br/>" + msg.content + '</div>');
+        output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
+        chatViewCtrl.refreshController();
       },
       presence: function(m){
         //join och leave meddelande
+        if(m.action == "leave"){
+          output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has left the chat</div>');
+          model.mate = {id : null, pos : null, name : null};
+          model.notifyObservers("updateMatePos");
+        }else if(m.action == "join" && m.uuid != model.my.id){
+           output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has joined the chat</div>');
+        }
         console.log(m);
       }
     });
+    initialize();
   }
-  initialize();
-
 
   this.update = function(code){
     console.log("update view");

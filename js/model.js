@@ -36,12 +36,12 @@ var Model = function () {
   model.activeChannels = ['moo'];
 
   this.addObserver = function(obs){
-    this.observers.push(obs);
+    model.observers.push(obs);
   }
 
   this.notifyObservers = function(code){
     for (var i in this.observers){
-      this.observers[i].update(code);
+      model.observers[i].update(code);
     }
   }
 
@@ -51,29 +51,30 @@ var Model = function () {
   	//dvs subscrive till lat:long , lat+1:long, lat-1:long, lat:long+1 osv
   	//bevaka public channel
   	//for(var i in geoHash){}
-  	this.unsubAll();
+  	model.unsubAll();
   	model.activeChannels.push("waitingRoom"); //byt med geo
   	pubnub.subscribe({
       	'channel'   : 'waitingRoom', //byt ut sedan
       	'callback'  : function(msg) {
       		
-          	if (model.my.id === msg.reciever){
+          	if (model.my.id == msg.reciever){
           		console.log(msg);
             		if(msg.mtype==="REQ"){
                   console.log('Request detected');//notifyObservers(); //respondToRequest(msg.sender);
-                  model.mate.pos = new google.maps.LatLng(msg.pos.A,msg.pos.F);
-                  model.mate.id = msg.sender;
-                  givePosition(msg.sender);
+                  model.mate = msg.sender;
+                  model.mate.pos = new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
+                  givePosition(msg.sender.id);
                   model.notifyObservers(['updateMatePos','requestPrompt']);
             		}
                 else if(msg.mtype==="POS"){
                   console.log('Position returned');//notifyObservers(); //respondToRequest(msg.sender);
-                  model.mate.pos = new google.maps.LatLng(msg.pos.A,msg.pos.F);
+                  model.mate = msg.sender;
+                  model.mate.pos = new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
                   model.notifyObservers(['updateMatePos']);
                 }
             		else if(msg.mtype==="RES") {
                   console.log('response detected');//notifyObservers(); //
-                  model.enterChat(msg.sender ,model.my.id);
+                  model.enterChat(msg.sender.id,model.my.id);
                   //notifyObservers('');
             		}
             		else if(msg.mtype === "DEN"){
@@ -103,10 +104,10 @@ var Model = function () {
   this.requestChat = function(){
   	//slumpa någon ur waitingRoom och skicka en request
     if (users.length > 1) { //Om det finns andra att chatta med än en själv
-    	var chatPartner = this.randomElement(users); //Väljer en random chatpartner
+    	var chatPartner = model.randomElement(users); //Väljer en random chatpartner
     	pubnub.publish({
         'channel' : 'waitingRoom',
-        'message' : {"mtype": "REQ", "sender":model.my.id, "reciever":chatPartner, 'pos' : model.my.pos}
+        'message' : {"mtype": "REQ", "sender": model.my, "reciever":chatPartner}
     	});
       model.state = 1;
       model.mate.id = chatPartner;
@@ -122,7 +123,7 @@ var Model = function () {
     console.log(model.my.pos);
     pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "POS", "sender":model.my.id, "reciever":initiator, 'pos' : model.my.pos}
+          'message' : {"mtype": "POS", "sender": model.my, "reciever":initiator}
       });
   }
 
@@ -132,9 +133,9 @@ var Model = function () {
   	//skicka bekräftelse tillbaka
   	pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "RES", "sender":model.my.pos, "reciever":model.mate.id}
+          'message' : {"mtype": "RES", "sender":model.my, "reciever":model.mate.id}
     	});
-    	model.enterChat(model.my.pos, model.mate.id);
+    	model.enterChat(model.my.id, model.mate.id);
   }
 
   this.denyRequest = function(){
@@ -143,7 +144,7 @@ var Model = function () {
     console.log("model deny " + model.mate.id);
   	pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "DEN", "sender":model.my.pos, "reciever":model.mate.id}
+          'message' : {"mtype": "DEN", "sender":model.my, "reciever":model.mate.id}
     	});
     model.mate.id = null;
     model.mate.pos = null;
@@ -151,13 +152,13 @@ var Model = function () {
     model.notifyObservers(['updateMatePos'])
   }
 
-  this.randomElement = function() {
+  this.randomElement = function(array) {
   	//Randomizes users array and selects a random element
-    console.log(users);
-  	var array = users;
-  	array.splice(array.indexOf(userId,1))
-  	var item = array[Math.floor(Math.random()*array.length)];
-    	return item; //selects a random element
+  	var lArray = $.extend(true, [], array); //deepc copy users
+  	lArray.splice(lArray.indexOf(model.my.id),1);
+  	var item = lArray[Math.floor(Math.random()*lArray.length)];
+    console.log("Request: " + item);
+    return item; //selects a random element
   }
 
   this.enterChat = function(uuidA,uuidB) {
@@ -208,11 +209,12 @@ var Model = function () {
   //   return '<div id='+id+'>' + msg+" : "+name+'</div>';
   // }
 
-<<<<<<< HEAD
   this.sendMsg = function(content) {
+    var timestamp = new Date();
+    timestamp = ((timestamp.getHours() < 10)? "0":"") + timestamp.getHours() + ":" + ((timestamp.getMinutes() < 10)? "0":"") + timestamp.getMinutes();
     pubnub.publish({
       'channel' : model.activeChannels[0],
-      'message' : {"mtype": "DEN", "sender": model.my, "reciever":model.mate, "content":content}
+      'message' : {"mtype": "DEN", "sender": model.my, "reciever":model.mate, "content":content, "timestamp":timestamp}
     });
   }
 //kanske kan vara lite längre?
