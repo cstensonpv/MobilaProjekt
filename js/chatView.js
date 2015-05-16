@@ -3,7 +3,7 @@ var ChatView = function(container, model){
   var directionsService = new google.maps.DirectionsService();
   var dMap;
   this.shrinkMap = $('#closeMap');
-  this.expandMap = $('#dMap');
+  this.expandMap = $('#map-directions');
   this.txtChat = $('#txtChat');
   this.btnChat = $('#btnChat');
   this.btnLeave = $('#btnLeaveChat');
@@ -22,11 +22,11 @@ var ChatView = function(container, model){
     var chatOutput = document.getElementById("chatOutput");
     dMap = new google.maps.Map(mapDiv, mapOptions);
     directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.setMap(dMap);
     newControl(dMap,'');
     mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
     chatOutput.style.height = (window.innerHeight*0.83).toFixed(0)-44.375 + 'px'; // 44.375 är höjden på headern i iPhone 5.
     calcRoute();
+    directionsDisplay.setMap(dMap);
     google.maps.event.trigger(dMap, 'resize');
   }
 
@@ -39,7 +39,7 @@ var ChatView = function(container, model){
     if(map.css('height') == smallMapHeight){
       console.log("Expanding map");
       map.animate({height : bigMapHeight},200,'swing',function(){ // när animationen är klar, gör detta:
-        $('#chatOutput').hide();
+        $('#chatDiv').hide();
         $('#closeMap').show();
         calcRoute();
         google.maps.event.trigger(dMap, 'resize'); //uppdaterar rendrering på kartan. Resizar kartan för fönsterstorleken.
@@ -58,7 +58,7 @@ var ChatView = function(container, model){
       calcRoute();
       google.maps.event.trigger(dMap, 'resize');
     });
-    $('#chatOutput').show();
+    $('#chatDiv').show();
   }
 
   var calcRoute = function() {
