@@ -3,13 +3,14 @@
 var Model = function () {
 
   var model = this;
-  this.usrLatLng = "falsk frukt";
+  //this.usrLatLng = "falsk frukt";
   this.state = 0;
 
   // 0 - waitingRoom
   // 1 - sent REQ redan här borde användarna unsubba från waiting och gå in i ett privat rum ^^
   
   this.observers = [];
+  this.my = {id : null, pos : null, name : "Me!!"};
   this.mate = {id : null, pos : null, name : null}; //man borde ha ett eget sådant här obj också
   model.chatRoom; //Det rum två chattande personer är i
   // this.matePos = null;
@@ -30,12 +31,9 @@ var Model = function () {
     	subscribe_key : "sub-c-bea78536-e9a9-11e4-91d3-0619f8945a4f",
     	uuid : UUID
   });
-  var userId = UUID//pubnub.uuid();
+  this.my.id = UUID//pubnub.uuid();
   var users = [];
   model.activeChannels = ['moo'];
-
-  
-  console.log(userId);
 
   this.addObserver = function(obs){
     this.observers.push(obs);
@@ -59,7 +57,7 @@ var Model = function () {
       	'channel'   : 'waitingRoom', //byt ut sedan
       	'callback'  : function(msg) {
       		
-          	if (userId === msg.reciever){
+          	if (model.my.id === msg.reciever){
           		console.log(msg);
             		if(msg.mtype==="REQ"){
                   console.log('Request detected');//notifyObservers(); //respondToRequest(msg.sender);
@@ -75,7 +73,7 @@ var Model = function () {
                 }
             		else if(msg.mtype==="RES") {
                   console.log('response detected');//notifyObservers(); //
-                  model.enterChat(msg.sender ,userId);
+                  model.enterChat(msg.sender ,model.my.id);
                   //notifyObservers('');
             		}
             		else if(msg.mtype === "DEN"){
@@ -108,7 +106,7 @@ var Model = function () {
     	var chatPartner = this.randomElement(users); //Väljer en random chatpartner
     	pubnub.publish({
         'channel' : 'waitingRoom',
-        'message' : {"mtype": "REQ", "sender":userId, "reciever":chatPartner, 'pos' : model.usrLatLng}
+        'message' : {"mtype": "REQ", "sender":model.my.id, "reciever":chatPartner, 'pos' : model.my.pos}
     	});
       model.state = 1;
       model.mate.id = chatPartner;
@@ -121,10 +119,10 @@ var Model = function () {
   var givePosition = function(initiator){
     //slumpad användare blir tillfrågad
     //skicka bekräftelse tillbaka
-    console.log(model.usrLatLng);
+    console.log(model.my.pos);
     pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "POS", "sender":userId, "reciever":initiator, 'pos' : model.usrLatLng}
+          'message' : {"mtype": "POS", "sender":model.my.id, "reciever":initiator, 'pos' : model.my.pos}
       });
   }
 
@@ -134,9 +132,9 @@ var Model = function () {
   	//skicka bekräftelse tillbaka
   	pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "RES", "sender":userId, "reciever":model.mate.id}
+          'message' : {"mtype": "RES", "sender":model.my.pos, "reciever":model.mate.id}
     	});
-    	model.enterChat(userId, model.mate.id);
+    	model.enterChat(model.my.pos, model.mate.id);
   }
 
   this.denyRequest = function(){
@@ -145,7 +143,7 @@ var Model = function () {
     console.log("model deny " + model.mate.id);
   	pubnub.publish({
           'channel' : 'waitingRoom',
-          'message' : {"mtype": "DEN", "sender":userId, "reciever":model.mate.id}
+          'message' : {"mtype": "DEN", "sender":model.my.pos, "reciever":model.mate.id}
     	});
     model.mate.id = null;
     model.mate.pos = null;
@@ -169,7 +167,7 @@ var Model = function () {
     // pubnub.subscribe({
     //   'channel'   : uuidA+':'+uuidB,
     //   'callback'  : function(msg) {
-    //     if (msg.sender === userId) {
+    //     if (msg.sender === model.my.pos) {
     //       $("#output").append(printMsg("sentMsg", msg.contents, msg.sender)); //senare ska vi skicka namn istället för msg.sender
     //     }
     //     else {
@@ -195,8 +193,8 @@ var Model = function () {
   this.getLocation = function(callback) { //tar fram koordinater
     	 if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-          model.usrLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
-          callback(model.usrLatLng);
+          model.my.pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
+          callback(model.my.pos);
         });
     	}
     	else { 
@@ -210,6 +208,7 @@ var Model = function () {
   //   return '<div id='+id+'>' + msg+" : "+name+'</div>';
   // }
 
+<<<<<<< HEAD
   this.sendMsg = function(content) {
     pubnub.publish({
       'channel' : model.activeChannels[0],
