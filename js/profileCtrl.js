@@ -13,25 +13,6 @@ var ProfileCtrl = function(view,model){
 		//view.takePic();
 		window.location = "#waitingRoom";
 		model.my.name = $("#inputName").val();
-
-		var input = $('#selectPic');
-		console.log(input);
-		if (input.files && input.files[0]) {
-       		var reader = new FileReader();
-            reader.onload = function (e) {
-                convertImgToBase64URL(e.target.result, function(base64Img){
-		   		model.my.pic = base64img;
-		   		console.log(model.my.pic);
-				});
-            }
-            
-            reader.readAsDataURL(input.files[0]);
-        }
-		// convertImgToBase64URL($('#selectPic').val(), function(base64Img){
-	 //   		model.my.pic = base64img;
-	 //   		console.log(model.my.pic);
-		// });
-		
 	})
 
 	//lånat från http://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript

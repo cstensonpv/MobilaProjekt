@@ -33,6 +33,7 @@
 
     <script src="js/app.js"></script>
     <script src="js/model.js"></script>
+    <script src="js/cropImage.js"></script>
     <script src="shake/shake.js"></script>
     <script src="js/shakeCtrl.js"></script>
     <script src="js/profileCtrl.js"></script>
@@ -106,6 +107,12 @@
       background:#E9E9E9
     }
 
+    .profileThumb{
+      border-radius: 50%;
+      vertical-align:middle;
+      margin-right:15px;
+    }
+
     .theirMsg{
       background-color: rgba(180,180,255,0.8);
       max-width:80%;
@@ -142,8 +149,8 @@
       <p>Select image: </p>
       <input id="selectPic" type="file" accept="image/*"></input>
       <!--video id="video" width="640" height="480" autoplay></video-->
-      <!--canvas id="capturedPhoto" width="500" height="400">
-      </canvas-->
+      <canvas id="capturedPhoto" width="500" height="400">
+      </canvas>
     </div>
 
 

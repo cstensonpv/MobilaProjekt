@@ -1,4 +1,4 @@
-var ProfileView = function(container, model){
+var ProfileView = function(container, model, cropCtrl){
   console.log("profileview");
   this.sendName = $('#sendName');
   this.selectPic = $('#selectPic');
@@ -6,27 +6,31 @@ var ProfileView = function(container, model){
   this.video = document.getElementById("video");
   this.body = $('#body');
   this.videoObj = { "video": true }
-  //this.context = this.photoCanvas.getContext("2d"),
+  this.context = this.photoCanvas.getContext("2d");
 
   this.errBack = function(error) {
       console.log("Video capture error: ", error.code); 
     };
 
-  this.picChange = function(evt) {
-    console.log("picChange");
-    var fileInput = evt.target.files;
-    if(fileInput.length>0){
-      var windowURL = window.URL || window.webkitURL;
-      var picURL = windowURL.createObjectURL(fileInput[0]);
-      var ctx = this.photoCanvas.getContext("2d");
-      var photo = new Image();
-      photo.onload = function(){
-        ctx.drawImage(photo, 0, 0, 500, 400);
-      }
-      photo.src = picURL;
-      windowURL.revokeObjectURL(picURL);
-    }
+  this.picChange = function(e) {
+    // var reader = new FileReader();
+    // console.log("picChange");
+    // var fileInput = evt.target.files;
+    // if(fileInput.length>0){
+
+    //   reader.onload = function (e) {
+    //     model.my.pic = e.target.result;
+    //     //model.my.pic = resizeCrop( e.target.result, 64, 64 ).toDataURL('image/jpg', 90);
+    //     console.log(model.my.pic);
+    //     console.log(typeof(model.my.pic));
+    //    };
+    //   reader.readAsDataURL(fileInput[0]);
+
+    // }
+    cropCtrl.cropImage(e);
   }
+
+
 
   // this.takePic = function() {
   //   this.context.drawImage(video, 0, 0, 640, 480);

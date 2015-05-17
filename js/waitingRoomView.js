@@ -75,7 +75,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 
 	var requestPrompt = function(){
 		console.log("emil feels chatty!")
-		var promptBox = new google.maps.InfoWindow({content:'<div>' + model.mate.name + ' wants to chat with you!</div>'})
+		var promptBox = new google.maps.InfoWindow({content:'<div><img src="'+model.mate.pic+'" class="profileThumb"/><p>' + model.mate.name + ' wants to chat with you!</p></div>'})
 		promptBox.open(wMap,mateLocation);
 		$("#waitingRoomFooter").show("fast");
 	}
