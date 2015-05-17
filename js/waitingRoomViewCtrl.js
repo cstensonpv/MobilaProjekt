@@ -1,7 +1,11 @@
 var WaitingRoomViewCtrl = function(view,model,shakeCtrl){
 	//console.log(view.randomButton);
 	shakeCtrl.activateShake(function(){
-		window.navigator.vibrate(1000);
+		if(window.navigator.vibrate){
+			window.navigator.vibrate(1000);
+		}else{
+			console.log("shaek");
+		}
 		if (model.state == 1){
 			model.denyRequest()
 		} 
@@ -19,8 +23,10 @@ var WaitingRoomViewCtrl = function(view,model,shakeCtrl){
 	view.btnDeny.click(function(){
 		console.log("deny")
 		model.denyRequest();
+		$("#waitingRoomFooter").hide("fast");
 	});
 	view.btnAccept.click(function(){
+		$("#waitingRoomFooter").hide("fast");
 		model.acceptRequest();
 	});
 }

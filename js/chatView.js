@@ -7,10 +7,14 @@ var ChatView = function(container, model){
   this.txtChat = $('#txtChat');
   this.btnChat = $('#btnChat');
   this.btnLeave = $('#btnLeaveChat');
+  this.chatFooter = $('#chatFooter');
+  console.log(this.chatFooter);
 
   model.addObserver(this);
 
   var initialize = function () {
+    console.log($('#chatFooter'));
+    console.log($('#chatFooter')[0].offsetHeight);
     console.log("Initializing google maps");
     var stockholm = new google.maps.LatLng(59.3275, 18.0675);
     var mapOptions = {
@@ -24,10 +28,14 @@ var ChatView = function(container, model){
     directionsDisplay = new google.maps.DirectionsRenderer();
     newControl(dMap,'');
     mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
-    chatOutput.style.height = (window.innerHeight*0.83).toFixed(0)-44.375 + 'px'; // 44.375 är höjden på headern i iPhone 5.
-    calcRoute();
+    chatOutput.style.height = (window.innerHeight*0.83).toFixed(0) - 44.375 - 106 + 'px'; // 44.375 är höjden på headern i iPhone 5.
+    //calcRoute();
     directionsDisplay.setMap(dMap);
-    google.maps.event.trigger(dMap, 'resize');
+    $(document).bind('pageshow',function(event, data){
+      console.log("wop");
+      google.maps.event.trigger(dMap,'resize');
+      calcRoute();
+    });
   }
 
   this.mapExpand = function(){  
@@ -125,10 +133,12 @@ var ChatView = function(container, model){
         //join och leave meddelande
         if(m.action == "leave"){
           output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has left the chat</div>');
+          output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
           model.mate = {id : null, pos : null, name : null};
           model.notifyObservers("updateMatePos");
         }else if(m.action == "join" && m.uuid != model.my.id){
-           output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has joined the chat</div>');
+          output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has joined the chat</div>');
+          output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
         }
         console.log(m);
         //chatViewCtrl.refreshController();

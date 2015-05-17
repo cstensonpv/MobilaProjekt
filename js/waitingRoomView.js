@@ -32,11 +32,10 @@ var WaitingRoomView = function(container,model,shakeCtrl){
     
 
 	var initialize = function() {
-	    console.log("Initializing google maps");
-	    var stockholm = new google.maps.LatLng(59.3275, 18.0675);
+		wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px';
 	    var mapOptions = {
 	      zoom:12,
-	      center: stockholm,
+	      center: model.my.pos,
 	      disableDefaultUI: true
 	    };
 
@@ -62,7 +61,12 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	    setInterval(function(){
 	    	model.getLocation(updateMyLocation);
 	    }, 200);
-	    wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px'//(window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
+
+		$(document).bind('pageshow',function(event, data){
+			console.log("wop");
+			google.maps.event.trigger(wMap,'resize');
+			wMap.setCenter(model.my.pos);
+		});
 	}
 
 	var setMatePos = function(uuid){
@@ -80,7 +84,6 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 			//return addMarker(request_image,model.mate.pos,"Request sent!");
 		}
 	}
-
 
 	var addMarker = function(image, LatLng, content){ // skapar en ny marker och om content finns med ett info
       console.log(content);
@@ -105,9 +108,10 @@ var WaitingRoomView = function(container,model,shakeCtrl){
     }
 
 	var requestPrompt = function(uuid){
-		console.log("emil feels chatty! " +uuid);
-		var promptBox = new google.maps.InfoWindow({content:'<div>' + model.mate.name + ' wants to chat with you!</div>'})
+		console.log("emil feels chatty!")
+		var promptBox = new google.maps.InfoWindow({content:'<div><img src="'+model.mate.pic+'" class="profileThumb"/><p>' + model.mate.name + ' wants to chat with you!</p></div>'})
 		promptBox.open(wMap,usersMarkers[uuid]);
+		$("#waitingRoomFooter").show("fast");
 	}
 
 	var updateUserPositions = function(usersPos){
@@ -137,6 +141,12 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	}	
 
 
+	var updateMap = function(){
+		initialize();
+		console.log("fixa kartan");
+	}
+	
+
 	this.update = function(code){
 		//console.log("update view");
 		for (var msg in code){
@@ -148,11 +158,16 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 			}else if("updateUserPositions" === code[msg]){
 				//console.log("update positions");
 				updateUserPositions(model.usersPos);
+			}else if("renderMap" === code[msg]){
+				updateMap();
 			}
 		}
 	}
 
 	model.addObserver(this);
 	initialize();
+
+
+
 	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model,shakeCtrl);
 }

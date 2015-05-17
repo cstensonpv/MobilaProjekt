@@ -92,6 +92,7 @@ var Model = function () {
       }
     	},
     	presence: function(m){
+        console.log(this.channel);
         if (m.action === "join" && model.users.indexOf(m.uuid) === -1){
     		  model.users.push(m.uuid);
           //model.sendPosition();
