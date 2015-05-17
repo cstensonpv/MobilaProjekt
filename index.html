@@ -65,6 +65,11 @@
       width: 100%;
     }
 
+    #chatOutput{
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .infoMsg{
       background-color: rgba(180,180,180,0.8);
       max-width:60%;
@@ -87,6 +92,16 @@
       margin-right: 10px;
     }
 
+    .ourFooter{
+      width:100%;
+      margin:auto;
+      bottom:0;
+      left:0;
+      right:0;
+      position:fixed;
+      background:#E9E9E9
+    }
+
     .theirMsg{
       background-color: rgba(180,180,255,0.8);
       max-width:80%;
@@ -94,6 +109,10 @@
       border-radius: 20px;
       padding:10px;
       margin-top:5px;
+    }
+
+    #waitingRoomFooter{
+      display: none;
     }
 </style>
 
@@ -121,8 +140,8 @@
       </div>
 
       <!-- Tror inte vi ska ha input message i en footer. Det verkar vara svårt att style skit i en jQuery footer -->
-      <div data-role="footer" data-position="fixed" class="ui-field-contain" data-theme="a">
-        <button id="btnDeny" data-theme="b" style="width:50%">Deny</button><button id="btnAccept" data-theme="a" style="width:50%">Accept</button>          
+      <div class="ourFooter" data-theme="a" id="waitingRoomFooter">
+        <button id="btnDeny" data-theme="b" style="width:50%;display:inline-block">Deny</button><button id="btnAccept" data-theme="a" style="width:50%;display:inline-block">Accept</button>          
       </div>
     </div>
 
@@ -130,19 +149,18 @@
     <div data-role="page" id="chat">
       <div id ="header" data-role="header">
       <button id="btnLeaveChat" ata-inline="true" class="btn" style="width=10%">Leave chat</button>
-        <h1>Map?</h1>
-        <!-- <a href="#chat" class="ui-btn-right" position="right">Chat!</a> -->
+        <h1>Who dat?</h1>
         <a id="closeMap" href="" class="ui-btn-right" position="right" style="display:none">Close</a>
       </div>
       <div data-role="main" style="height:100%">
-        <!--div id="dMap" style="width:820px"-->
           <div id="map-directions"></div>
-        <!--/div-->
         <div id="chatDiv">
           <div id="chatOutput"></div>
             
-          <div style="width:80%;margin:auto;bottom:0;left:0;right:0;position:fixed;">
-            <input id="txtChat"placeholder="Skriv något najs här!"></input><button id="btnChat">Send</button>
+          <div id="chatFooter" class="ourFooter">
+            <div style="width:80%;margin:auto">
+              <input id="txtChat"placeholder="Skriv något najs här!"></input><button id="btnChat">Send</button>
+            </div>
           </div>
         </div>
 

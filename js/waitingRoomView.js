@@ -11,6 +11,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	var wMap;
 
 	var initialize = function() {
+		wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px';
 	    console.log("Initializing google maps");
 	    var stockholm = new google.maps.LatLng(59.3275, 18.0675);
 	    var mapOptions = {
@@ -41,7 +42,6 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	    setInterval(function(){
 	    	model.getLocation(updateMyLocation);
 	    }, 200);
-	    wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px'//(window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
 	}
 
 	var setMatePos = function(){
@@ -73,6 +73,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		console.log("emil feels chatty!")
 		var promptBox = new google.maps.InfoWindow({content:'<div>' + model.mate.name + ' wants to chat with you!</div>'})
 		promptBox.open(wMap,mateLocation);
+		$("#waitingRoomFooter").show("fast");
 	}
 
 
