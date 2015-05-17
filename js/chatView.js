@@ -29,9 +29,13 @@ var ChatView = function(container, model){
     newControl(dMap,'');
     mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
     chatOutput.style.height = (window.innerHeight*0.83).toFixed(0) - 44.375 - 106 + 'px'; // 44.375 är höjden på headern i iPhone 5.
-    calcRoute();
+    //calcRoute();
     directionsDisplay.setMap(dMap);
-    google.maps.event.trigger(dMap, 'resize');
+    $(document).bind('pageshow',function(event, data){
+      console.log("wop");
+      google.maps.event.trigger(dMap,'resize');
+      calcRoute();
+    });
   }
 
   this.mapExpand = function(){  

@@ -12,11 +12,9 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 
 	var initialize = function() {
 		wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px';
-	    console.log("Initializing google maps");
-	    var stockholm = new google.maps.LatLng(59.3275, 18.0675);
 	    var mapOptions = {
 	      zoom:12,
-	      center: stockholm,
+	      center: model.my.pos,
 	      disableDefaultUI: true
 	    };
 
@@ -42,6 +40,12 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	    setInterval(function(){
 	    	model.getLocation(updateMyLocation);
 	    }, 200);
+
+		$(document).bind('pageshow',function(event, data){
+			console.log("wop");
+			google.maps.event.trigger(wMap,'resize');
+			wMap.setCenter(model.my.pos);
+		});
 	}
 
 	var setMatePos = function(){
@@ -77,6 +81,12 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	}
 
 
+	var updateMap = function(){
+		initialize();
+		console.log("fixa kartan");
+	}
+	
+
 	this.update = function(code){
 		console.log("update view");
 		for (var msg in code){
@@ -84,11 +94,16 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 				setMatePos();
 			}else if("requestPrompt" === code[msg]){
 				requestPrompt();
+			}else if("renderMap" === code[msg]){
+				updateMap();
 			}
 		}
 	}
 
 	model.addObserver(this);
 	initialize();
+
+
+
 	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model,shakeCtrl);
 }

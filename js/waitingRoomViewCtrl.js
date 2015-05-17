@@ -26,7 +26,7 @@ var WaitingRoomViewCtrl = function(view,model,shakeCtrl){
 		$("#waitingRoomFooter").hide("fast");
 	});
 	view.btnAccept.click(function(){
-		model.acceptRequest();
 		$("#waitingRoomFooter").hide("fast");
+		model.acceptRequest();
 	});
 }
