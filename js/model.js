@@ -14,7 +14,10 @@ var Model = function () {
   this.mate = {id : null, pos : null, name : null}; //man borde ha ett eget sådant här obj också
   this.chatRoom; //Det rum två chattande personer är i
   this.users = [];
+  this.usersPos = {};
   this.activeChannels = [];
+
+  
 
   //Get UUID from user and specify PubNub keys
   var UUID = PUBNUB.db.get('session') || (function(){ 
@@ -53,6 +56,7 @@ var Model = function () {
   	pubnub.subscribe({
     	'channel'   : model.activeChannels, //byt ut sedan
     	'callback'  : function(msg) {
+        //console.log(msg.mtype);
     		
       	if (model.my.id == msg.reciever){
       		console.log(msg);
@@ -79,16 +83,23 @@ var Model = function () {
             model.mate.pos = null;
             model.notifyObservers(['updateMatePos']);
       		}
-      	}
+          ///////////////////////////
+      	}else if(msg.mtype==="OPO"){
+          //console.log('ONLYPosition returned');//notifyObservers(); //respondToRequest(msg.sender);
+          //console.log(msg.sender.id +" : "+msg.sender.pos.A+" : "+msg.sender.pos.F);
+          model.usersPos[msg.sender.id] = msg.sender //new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
+
+      }
     	},
     	presence: function(m){
         if (m.action === "join" && model.users.indexOf(m.uuid) === -1){
     		  model.users.push(m.uuid);
+          //model.sendPosition();
           console.log("pushat i presence! "+ m.uuid);
         }else if (m.action === "timeout" || m.action === "leave"){
           console.log(m.action);
           if(model.users.indexOf(m.uuid) != -1){
-            console.log('splicar i presence! ' + m.uuid)
+            console.log( m.uuid)
             model.users.splice(model.users.indexOf(m.uuid),1);
           }
         }
@@ -120,10 +131,16 @@ var Model = function () {
     model.activeChannels =[];
   }
 
-  this.requestChat = function(){
+  this.requestChat = function(partnerUuid){
+
+    console.log(partnerUuid);
   	//slumpa någon ur waitingRoom och skicka en request
     if (model.users.length > 1) { //Om det finns andra att chatta med än en själv
-    	var chatPartner = model.randomElement(model.users); //Väljer en random chatpartner
+      if(!partnerUuid){
+        var chatPartner = model.randomElement(model.users); //Väljer en random chatpartner
+      }else{
+        var chatPartner = model.users[model.users.indexOf(partnerUuid)];
+      }
     	console.log(chatPartner);
       console.log(model.my.id);
       pubnub.publish({
@@ -137,6 +154,14 @@ var Model = function () {
       alert("There are no available partners in this area, please move.");
     }
   }
+/////////////////////
+  this.sendPosition = function(){
+    pubnub.publish({
+      'channel' : model.chatRoom,
+      'message' : {"mtype": "OPO", "sender": model.my},
+    });
+  }
+////////////////////////
 
   var givePosition = function(initiator){
     //slumpad användare blir tillfrågad
@@ -219,6 +244,10 @@ var Model = function () {
         navigator.geolocation.getCurrentPosition(function(position){
           model.my.pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
           callback(model.my.pos);
+
+          ////////////////////////////
+          model.sendPosition();//skickar din egen position till alal andra
+          model.notifyObservers(['updateUserPositions'])
         });
     	}
     	else { 
@@ -253,20 +282,20 @@ var Model = function () {
       
     var newChannels = [];
     var channelChanged = false;
-    console.log(model.activeChannels);
-    console.log(geohashLat);
+    //console.log(model.activeChannels);
+    //console.log(geohashLat);
     for(var lat = geohashLat -1; lat <= geohashLat+1; lat++){
       for(var lng = geohashLng -1; lng <= geohashLng+1; lng++){
         newChannels.push(lat +" : "+ lng);
       }
     }
-    console.log(newChannels);
+    //console.log(newChannels);
     for(var channel = 0; channel<9; channel++){
       if(model.activeChannels.indexOf(newChannels[channel]) === -1){
         //ny subscribe
         channelChanged = true;
         model.activeChannels.push(newChannels[channel]);
-        console.log("sub: "+ newChannels[channel])
+        //console.log("sub: "+ newChannels[channel])
       }
       if(newChannels.indexOf(model.activeChannels[channel]) === -1){
         //unsubscribe
@@ -278,7 +307,7 @@ var Model = function () {
       }
     }
     model.subscribe();
-    console.log(model.activeChannels);
+    //console.log(model.activeChannels);
   }
 
   this.unsubscribe = function(channelName){
