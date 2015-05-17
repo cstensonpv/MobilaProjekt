@@ -67,7 +67,7 @@ var Model = function () {
             givePosition(msg.sender.id);
             model.notifyObservers(['updateMatePos','requestPrompt']);
       		}
-          else if(msg.mtype==="POS"){
+          else if(msg.mtype==="PRE"){
             console.log('Position returned');//notifyObservers(); //respondToRequest(msg.sender);
             model.mate = msg.sender;
             model.mate.pos = new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
@@ -84,7 +84,7 @@ var Model = function () {
             model.notifyObservers(['updateMatePos']);
       		}
           ///////////////////////////
-      	}else if(msg.mtype==="OPO"){
+      	}else if(msg.mtype==="POS"){
           //console.log('ONLYPosition returned');//notifyObservers(); //respondToRequest(msg.sender);
           //console.log(msg.sender.id +" : "+msg.sender.pos.A+" : "+msg.sender.pos.F);
           model.usersPos[msg.sender.id] = msg.sender //new google.maps.LatLng(msg.sender.pos.A,msg.sender.pos.F);
@@ -159,7 +159,7 @@ var Model = function () {
   this.sendPosition = function(){
     pubnub.publish({
       'channel' : model.chatRoom,
-      'message' : {"mtype": "OPO", "sender": model.my},
+      'message' : {"mtype": "POS", "sender": model.my},
     });
   }
 ////////////////////////
@@ -170,7 +170,7 @@ var Model = function () {
     console.log("Sending my positon");
     pubnub.publish({
           'channel' : model.chatRoom,
-          'message' : {"mtype": "POS", "sender": model.my, "reciever":initiator}
+          'message' : {"mtype": "PRE", "sender": model.my, "reciever":initiator}
       });
   }
 

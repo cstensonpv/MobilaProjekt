@@ -114,22 +114,28 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		$("#waitingRoomFooter").show("fast");
 	}
 
-	var updateUserPositions = function(usersPos){
+	var updateUserPositions = function(usersPos, users){
 		for(user in usersPos){
 			if(user != model.my.id){
-				var pos = new google.maps.LatLng(usersPos[user].pos.A,usersPos[user].pos.F);
-				if(usersMarkers[user]){
-					changeMarkerPosition(usersMarkers[user],pos);
+				if(users.indexOf(user) != -1){
+					var pos = new google.maps.LatLng(usersPos[user].pos.A,usersPos[user].pos.F);
+					if(usersMarkers[user]){
+						changeMarkerPosition(usersMarkers[user],pos);
+					}else{
+						var button = document.createElement("button");
+						button.onclick = function(){model.requestChat(user)}; 
+						var textnode = document.createTextNode("Request chat with "+usersPos[user].name);
+						button.appendChild(textnode);
+						var content="<button onclick='model.requestChat("+user+")'> Request chat with "+usersPos[user].name +"</button>";
+						usersMarkers[user] = addMarker(other_image,pos,button);
+					};
 				}else{
-					var button = document.createElement("button");
-					button.onclick = function(){model.requestChat(user)}; 
-					var textnode = document.createTextNode("Request chat with "+usersPos[user].name);
-					button.appendChild(textnode);
-					var content="<button onclick='model.requestChat("+user+")'> Request chat with "+usersPos[user].name +"</button>";
-					usersMarkers[user] = addMarker(other_image,pos,button);
-				};
+					delete userPos[user];
+					delete userMarkers[user];
+				}
 			}
 		}
+
 		//console.log("userMarkers");
 		//console.log(usersMarkers);
 	}
@@ -157,7 +163,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 				requestPrompt(model.mate.id);
 			}else if("updateUserPositions" === code[msg]){
 				//console.log("update positions");
-				updateUserPositions(model.usersPos);
+				updateUserPositions(model.usersPos, model.users);
 			}else if("renderMap" === code[msg]){
 				updateMap();
 			}
