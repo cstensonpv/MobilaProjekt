@@ -125,6 +125,11 @@
     #waitingRoomFooter{
       display: none;
     }
+
+    .ui-input-text{
+      width: 80%;
+      margin:0 auto;
+    }
 </style>
 
     <script>  
@@ -143,14 +148,18 @@
       <div data-role="header" data-position="fixed" id="header">
         <h2>Profile</h2>
       </div>
-      <p>Enter your name: </p>
-      <input id="inputName" placeholder="Enter profile name here"></input>
-      <button id="sendName">Done!</button>
-      <p>Select image: </p>
-      <input id="selectPic" type="file" accept="image/*"></input>
+      <div style="text-align:center">
+        <h2>Enter your name: </h2>
+        <input id="inputName" placeholder="Enter profile name here" type="text"></input>
+      </div>
+      <div style="text-align:center">
+        <h2>Select image: </h2>
+        <input id="selectPic" type="file" accept="image/*"></input>
+      </div>
       <!--video id="video" width="640" height="480" autoplay></video-->
-      <canvas id="capturedPhoto" width="500" height="400">
-      </canvas>
+      <button id="sendName" style="width:95%;margin:0 auto;margin-top:50px">Done!</button>
+      <!--canvas id="capturedPhoto" width="500" height="400">
+      </canvas-->
     </div>
 
 
