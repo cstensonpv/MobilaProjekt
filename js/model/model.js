@@ -31,6 +31,10 @@ var Model = function () {
   });
   this.my.id = UUID//pubnub.uuid();
 
+  setInterval(function(){
+    hereNow()
+  }, 1000);
+
   this.addObserver = function(obs){
     model.observers.push(obs);
   }
@@ -73,32 +77,19 @@ var Model = function () {
       	}
     	},
     	presence: function(m){
-        if (m.action === "join" && model.users.indexOf(m.uuid) === -1){
-    		  model.users.push(m.uuid);
-          console.log("pushat i presence! "+ m.uuid);
-        }else if (m.action === "timeout" || m.action === "leave"){
-          console.log(m.action);
-          if(model.users.indexOf(m.uuid) != -1){
-            console.log('splicar i presence! ' + m.uuid)
-            model.users.splice(model.users.indexOf(m.uuid),1);
-          }
-        }
+        hereNow()
     	}
     });
     hereNow();
-    console.log('Antal användare: ' + model.users.length);
   }
 
   var hereNow = function(){
     pubnub.here_now({
       channel: model.chatRoom,
       callback: function(m){
-        for(var user in m.uuids){
-          if(model.users.indexOf(m.uuids[user]) === -1){
-            console.log('pushar user i here_now!');
-            model.users.push(m.uuids[user]);
-          } 
-        }
+        model.users = m.uuids;
+        console.log(model.users.length);
+        $("#usersOnline").html(model.users.length + ' users online');
       }
     });
   }
@@ -203,8 +194,8 @@ var Model = function () {
     });
   }
 
-  this.geohash = function( coord, resolution ) {
-    var rez = Math.pow( 10, resolution || 0 );
+  this.geohash = function( coord ) {
+    var rez = Math.pow( 10,  2 );
     geohashLat = Math.floor(coord.A * rez);//returns an integer / rez;
     geohashLng = Math.floor(coord.F * rez);//returns an integer / rez;
     subscribeChannels(geohashLat, geohashLng);
