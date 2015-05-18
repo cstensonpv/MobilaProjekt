@@ -9,6 +9,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	var wMap;
 
 	var initialize = function() {
+		// initiates google map and sets center to My position.
 		wMapDiv.style.height = window.innerHeight.toFixed(0)-44 + 'px';
 	    var mapOptions = {
 	      zoom:12,
@@ -29,8 +30,6 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		    zIndex: 998,
 		    map: wMap
 		});
-
-
 	    
 	   	var updateMyLocation = function(pos){
 	    	myLocation.setPosition(pos);
@@ -40,23 +39,18 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	    }, 200);
 
 		$(document).bind('pageshow',function(event, data){
-			console.log("wop");
 			google.maps.event.trigger(wMap,'resize');
 			wMap.setCenter(model.my.pos);
 		});
 	}
 
 	var setMatePos = function(){
+		// sets the marker for the chat mate!
 		if(mateLocation != null || (mateLocation != null && model.mate.pos == null)){
-			console.log("remove marker");
 			mateLocation.setMap(null);
 			$("#waitingRoomFooter").hide("fast");
 		}
 		if(model.mate.pos != null){
-			console.log("set mate pos");
-			console.log(wMap);
-			console.log(model.mate.pos);
-			console.log(model.my.pos)
 		    mateLocation = new google.maps.Marker({
 			    clickable: false,
 			    icon: {url: "http://simile.mit.edu/timeline/api/images/dark-red-circle.png",
@@ -77,7 +71,6 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	}
 
 	var requestPrompt = function(){
-		console.log("emil feels chatty!")
 		var promptBox = new google.maps.InfoWindow({content:'<div><img src="'+model.mate.pic+'" class="profileThumb"/><p>' + model.mate.name + ' wants to chat with you!</p></div>'})
 		promptBox.open(wMap,mateLocation);
 		$("#waitingRoomFooter").show("fast");
@@ -87,12 +80,9 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 
 	var updateMap = function(){
 		initialize();
-		console.log("fixa kartan");
 	}
 	
-
 	this.update = function(code){
-		console.log("update view");
 		for (var msg in code){
 			if("updateMatePos" === code[msg]){
 				setMatePos();
@@ -102,14 +92,14 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 				updateMap();
 			}else if("hideRequest" === code[msg]){
 				$("#mateName").hide("fast");
+			}else if("showRequest" === code[msg]){
+				$("#mateName").show("fast");
 			}
 		}
 	}
 
 	model.addObserver(this);
 	initialize();
-
-
 
 	var waitingRoomViewCtrl = new WaitingRoomViewCtrl(this, model,shakeCtrl);
 }

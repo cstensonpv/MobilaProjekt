@@ -1,0 +1,85 @@
+#map-directions {
+  position: relative;
+  background-color: #E5E3DF;
+  overflow: hidden;
+  width: 100%;
+}
+#durationImg{
+  width: 5vw;
+  display: inline;
+}
+#durationDiv{
+  background-color: white;
+}
+#durationTime{
+  font-size: 6vw;
+  display: inline;
+}
+#chat{
+  position: absolute;
+  width: 100%;
+}
+
+#chatOutput{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.infoMsg{
+  background-color: rgba(180,180,180,0.8);
+  max-width:60%;
+  margin-left: 20%;
+  margin.right: 20%;
+  border-radius: 20px;
+  text-align: center;
+  padding:10px;
+  margin-top:5px;
+  margin-right: 10px;
+}
+
+.myMsg{
+  background-color: rgba(180,255,180,0.8);
+  max-width:80%;
+  margin-left: 20%;
+  border-radius: 20px;
+  padding:10px;
+  margin-top:5px;
+  margin-right: 10px;
+  word-wrap:break-word;
+}
+
+.ourFooter{
+  width:100%;
+  margin:auto;
+  bottom:0;
+  left:0;
+  right:0;
+  position:fixed;
+  background:#E9E9E9;
+  text-align:center;
+}
+
+.profileThumb{
+  border-radius: 50%;
+  vertical-align:middle;
+  margin-right:15px;
+}
+
+.theirMsg{
+  background-color: rgba(180,180,255,0.8);
+  max-width:80%;
+  margin-left:0;
+  border-radius: 20px;
+  padding:10px;
+  margin-top:5px;
+  word-wrap: break-word;
+}
+
+#waitingRoomFooter, #mateName{
+  display: none;
+}
+
+.ui-input-text{
+  width: 80%;
+  margin:0 auto;
+}

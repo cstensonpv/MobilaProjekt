@@ -8,15 +8,12 @@ var ChatView = function(container, model){
   this.btnChat = $('#btnChat');
   this.btnLeave = $('#btnLeaveChat');
   this.chatFooter = $('#chatFooter');
-  console.log(this.chatFooter);
 
   model.addObserver(this);
 
   var initialize = function () {
-    console.log($('#chatFooter'));
-    console.log($('#chatFooter')[0].offsetHeight);
+    // creates map element and adds it to the DOM. We display the route to the other chat mate aswell.
     console.log("Initializing google maps");
-    var stockholm = new google.maps.LatLng(59.3275, 18.0675);
     var mapOptions = {
       zoom:2,
       center: model.my.pos,
@@ -29,10 +26,9 @@ var ChatView = function(container, model){
     newControl(dMap,'');
     mapDiv.style.height = (window.innerHeight*0.17).toFixed(0) + 'px'; // avrundar till 0 decimaler pga. intern avrunding annars.
     chatOutput.style.height = (window.innerHeight*0.83).toFixed(0) - 44.375 - 106 + 'px'; // 44.375 är höjden på headern i iPhone 5.
-    //calcRoute();
+
     directionsDisplay.setMap(dMap);
     $(document).bind('pageshow',function(event, data){
-      console.log("wop");
       google.maps.event.trigger(dMap,'resize');
       calcRoute();
     });
@@ -106,8 +102,6 @@ var ChatView = function(container, model){
     controlText.innerHTML = text;
     controlDiv.appendChild(controlText);
 
-    // Setup the click event listeners: simply set the map to
-    // stockholm
     google.maps.event.addDomListener(controlDiv);
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
 
@@ -148,14 +142,13 @@ var ChatView = function(container, model){
   }
 
   this.update = function(code){
-    console.log("update view");
     for (var msg in code){
       if("enterChat" === code[msg]){
+        console.log('update enterChat')
         enterChat();
       }
     }
   }
-
 
   var chatViewCtrl = new ChatViewCtrl(this, model);
 }

@@ -3,11 +3,10 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <meta charset="utf-8">
-    <title>Project Work</title>
+    <title>Shake chat</title>
 
     <!-- Android -->
     <meta name="mobile-web-app-capable" content="yes"> <!-- Fixar fullscreen-->
-    <link rel="icon" sizes="196x196" href="ikon.png"/>
     <meta name="theme-color" content="#FFBF53"> <!-- Fixar annan färg på status bar -->
 
     <!--  Apple -->
@@ -31,118 +30,19 @@
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
 
+    <link rel="stylesheet" href="style.css">
+
     <script src="js/app.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/cropImage.js"></script>
-    <script src="shake/shake.js"></script>
-    <script src="js/shakeCtrl.js"></script>
-    <script src="js/profileCtrl.js"></script>
-    <script src="js/profileView.js"></script>
-    <script src="js/waitingRoomView.js"></script>
-    <script src="js/waitingRoomViewCtrl.js"></script>
-    <script src="js/chatViewCtrl.js"></script>    
-    <script src="js/chatView.js"></script>
-
-
-
-
-    
-    <style type="text/css">
-    #map-directions {
-      position: relative;
-      background-color: #E5E3DF;
-      overflow: hidden;
-      width: 100%;
-    }
-    #durationImg{
-      width: 5vw;
-      display: inline;
-    }
-    #durationDiv{
-      background-color: white;
-    }
-    #durationTime{
-      font-size: 6vw;
-      display: inline;
-    }
-    #chat{
-      position: absolute;
-      width: 100%;
-    }
-
-    #chatOutput{
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .infoMsg{
-      background-color: rgba(180,180,180,0.8);
-      max-width:60%;
-      margin-left: 20%;
-      margin.right: 20%;
-      border-radius: 20px;
-      text-align: center;
-      padding:10px;
-      margin-top:5px;
-      margin-right: 10px;
-    }
-
-    .myMsg{
-      background-color: rgba(180,255,180,0.8);
-      max-width:80%;
-      margin-left: 20%;
-      border-radius: 20px;
-      padding:10px;
-      margin-top:5px;
-      margin-right: 10px;
-      word-wrap:break-word;
-    }
-
-    .ourFooter{
-      width:100%;
-      margin:auto;
-      bottom:0;
-      left:0;
-      right:0;
-      position:fixed;
-      background:#E9E9E9
-    }
-
-    .profileThumb{
-      border-radius: 50%;
-      vertical-align:middle;
-      margin-right:15px;
-    }
-
-    .theirMsg{
-      background-color: rgba(180,180,255,0.8);
-      max-width:80%;
-      margin-left:0;
-      border-radius: 20px;
-      padding:10px;
-      margin-top:5px;
-      word-wrap: break-word;
-    }
-
-    #waitingRoomFooter, #mateName{
-      display: none;
-    }
-
-    .ui-input-text{
-      width: 80%;
-      margin:0 auto;
-    }
-</style>
-
-    <script>  
-      $("#news").swiperight(function(){
-        console.log("swiped");
-        $("#catPanel").panel( "open" );
-      });
-      function test(){
-        console.log('Test!');
-      }
-    </script>
+    <script src="js/model/model.js"></script>
+    <script src="js/lib/cropImage.js"></script>
+    <script src="js/lib/shake.js"></script>
+    <script src="js/ctrl/shakeCtrl.js"></script>
+    <script src="js/ctrl/profileCtrl.js"></script>
+    <script src="js/ctrl/waitingRoomViewCtrl.js"></script>
+    <script src="js/ctrl/chatViewCtrl.js"></script>    
+    <script src="js/view/profileView.js"></script>
+    <script src="js/view/waitingRoomView.js"></script>
+    <script src="js/view/chatView.js"></script>
   </head>
 
   <body id="body">
@@ -158,27 +58,22 @@
         <h2>Select image: </h2>
         <input id="selectPic" type="file" accept="image/*"></input>
       </div>
-      <!--video id="video" width="640" height="480" autoplay></video-->
       <button id="sendName" style="width:95%;margin:0 auto;margin-top:50px" href="waitingRoom">Done!</button>
-      <!--canvas id="capturedPhoto" width="500" height="400">
-      </canvas-->
     </div>
 
 
     <div data-role="page" id="waitingRoom">
       <div data-role="header" data-position="fixed" id="header">
-       <!--  <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a> -->
         <button id="randomButton" ata-inline="true" class="btn" style="width=10%">Shake</button>
         <h2>Waiting room<span id="otheruser"></span></h2>
       </div>
       <div id="myMapPosition" data-role="main">    
       </div>
 
-      <!-- Tror inte vi ska ha input message i en footer. Det verkar vara svårt att style skit i en jQuery footer -->
       <div class="ourFooter" data-theme="a" id="waitingRoomFooter">
         <button id="btnDeny" data-theme="b" style="width:50%;display:inline-block">Deny</button><button id="btnAccept" data-theme="a" style="width:50%;display:inline-block">Accept</button>          
       </div>
-      <div class="ourFooter" data-theme="a" id="mateName"><h1>You sent a request!</h1></div>
+      <div class="ourFooter" data-theme="a" id="mateName"><center><h1>You sent a request!</h1></center></div>
     </div>
 
 
@@ -208,7 +103,7 @@
         <h2>Who dat?</h2>
       </div>
       <p>Your shared location is disabled! Please enable it to enter the waiting room</p>
-      <button id="btnLocation">Share location</button>
+      <button id="btnLocation">Try again!</button>
     </div>
 
 

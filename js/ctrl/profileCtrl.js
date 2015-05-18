@@ -1,22 +1,23 @@
-var ProfileCtrl = function(view,model){
-	console.log("profileCtrl");
+var ProfileCtrl = function(view,model, cropCtrl){
 	view.selectPic.change(function(evt){
-		console.log("Nu körs picChange");
-		view.picChange(evt);
+		cropCtrl.cropImage(evt);
 	});
 
 	$("#btnLocation").click(function(){
 		model.shareLocation();}
-		);
+	);
 
-	//view.sendName.click(function() {
 	$("#sendName").click(function() {
-		console.log($("#selectPic"));
-		console.log("click");
-		//view.takePic();
-		window.location = "#waitingRoom";
-		model.my.name = $("#inputName").val();
-	})
+		userName = $("#inputName").val();
+		if(userName == ''){
+			alert('please fill in name!')
+		}else{
+			window.location = "#waitingRoom";
+			model.my.name = userName;
+			localStorage.setItem('name', model.my.name);
+			localStorage.setItem('img',model.my.pic);
+		}
+	});
 
 	//lånat från http://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
 	function convertImgToBase64URL(url, callback, outputFormat){
@@ -34,21 +35,4 @@ var ProfileCtrl = function(view,model){
 	    };
 	    img.src = url;
 	}
-
-
-
-
-
-	//http://www.html5rocks.com/en/tutorials/getusermedia/intro/
-
-	//this is fine...
-	// this.refreshController = function(){
-	// 	console.log("refreshing controller")
-	// 	$("#btnChat").click(function(){
-	// 		console.log("send msg: " + $("#txtChat").val());
-	// 		model.sendMsg($("#txtChat").val());
-	// 		$("#txtChat").val('');
-	// 	});
-	// }
-
 }
