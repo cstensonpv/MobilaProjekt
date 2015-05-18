@@ -1,7 +1,6 @@
 //app.js
 $(function () {
 	//instantierar modellen i appen
-	
 	var model = new Model();
 	console.log(model);
 	//Här instansierar vi resten av views och controllers

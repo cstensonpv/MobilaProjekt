@@ -5,6 +5,9 @@ var ProfileCtrl = function(view,model){
 		view.picChange(evt);
 	});
 
+	$("#btnLocation").click(function(){
+		model.shareLocation();}
+		);
 
 	//view.sendName.click(function() {
 	$("#sendName").click(function() {
