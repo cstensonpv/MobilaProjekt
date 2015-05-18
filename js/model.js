@@ -289,6 +289,10 @@ var Model = function () {
     });
   }
 
-  this.getLocation( model.geohash );
+  this.shareLocation = function(){
+    navigator.geolocation.getCurrentPosition(function(){window.location = '#profile';},function(){alert("Location not found");window.location = '#shareLocation';});
+  }
+
+  this.getLocation(model.geohash);
   
 }

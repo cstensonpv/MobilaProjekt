@@ -8,6 +8,8 @@ var ProfileView = function(container, model, cropCtrl){
   this.videoObj = { "video": true }
   this.context = this.photoCanvas.getContext("2d");
 
+  model.shareLocation();
+
   this.errBack = function(error) {
       console.log("Video capture error: ", error.code); 
     };
