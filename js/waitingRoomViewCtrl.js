@@ -15,6 +15,7 @@ var WaitingRoomViewCtrl = function(view,model,shakeCtrl){
 		});
 
 	view.randomButton.click(function(){
+		console.log('Shake it!')
 		//window.navigator.vibrate(1000);
 		if (model.state == 1){
 			model.denyRequest()

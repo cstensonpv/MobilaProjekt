@@ -77,12 +77,11 @@ var Model = function () {
       		else if(msg.mtype === "DEN"){
       			console.log('Denial detected');//notifyObservers(); //sök efter ny partner?
             model.mate.pos = null;
-            model.notifyObservers(['updateMatePos']);
+            model.notifyObservers(['updateMatePos','hideRequest']);
       		}
       	}
     	},
     	presence: function(m){
-        console.log(this.channel);
         if (m.action === "join" && model.users.indexOf(m.uuid) === -1){
     		  model.users.push(m.uuid);
           console.log("pushat i presence! "+ m.uuid);
@@ -133,6 +132,7 @@ var Model = function () {
     	});
       model.state = 1;
       model.mate.id = chatPartner;
+      model.notifyObservers(['sentTo']);
     }
     else {
       alert("There are no available partners in this area, please move.");
@@ -219,7 +219,9 @@ var Model = function () {
     	 if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position){
           model.my.pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); //Fullösning att göra dessa publika?
-          callback(model.my.pos);
+          if(window.location.hash != "#chat"){ 
+            callback(model.my.pos);
+          }
         });
     	}
     	else { 
@@ -245,7 +247,7 @@ var Model = function () {
   this.geohash = function( coord, resolution ) {
     var rez = Math.pow( 10, resolution || 0 );
     geohashLat = Math.floor(coord.A * rez);//returns an integer / rez;
-    geohashLng = Math.floor(coord.F * rez);//returns an integer / rez; 
+    geohashLng = Math.floor(coord.F * rez);//returns an integer / rez;
     subscribeChannels(geohashLat, geohashLng);
     model.chatRoom = geohashLat+" : "+geohashLng;
   }

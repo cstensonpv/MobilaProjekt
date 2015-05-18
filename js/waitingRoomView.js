@@ -1,12 +1,10 @@
 var WaitingRoomView = function(container,model,shakeCtrl){
-	//this.randomButton = container.find("#randomButton");
 	var wMapDiv = this.wMapDiv = $("#myMapPosition")[0];
 	this.randomButton = $("#randomButton");
 	this.btnDeny = $("#btnDeny");
 	this.btnAccept = $("#btnAccept");
 	this.header = $("#header");
 
-	console.log(this.header.height());
 	var mateLocation = null;
 	var wMap;
 
@@ -52,6 +50,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		if(mateLocation != null || (mateLocation != null && model.mate.pos == null)){
 			console.log("remove marker");
 			mateLocation.setMap(null);
+			$("#waitingRoomFooter").hide("fast");
 		}
 		if(model.mate.pos != null){
 			console.log("set mate pos");
@@ -60,10 +59,14 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 			console.log(model.my.pos)
 		    mateLocation = new google.maps.Marker({
 			    clickable: false,
-			    icon: new google.maps.MarkerImage('http://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Red_pog.svg/64px-Red_pog.svg.png',
-	                new google.maps.Size(22,22),
-	                new google.maps.Point(0,18),
-	                new google.maps.Point(11,11)),
+			    icon: {url: "http://simile.mit.edu/timeline/api/images/dark-red-circle.png",
+			      // This marker is 20 pixels wide by 32 pixels tall.
+			      size: new google.maps.Size(16, 16),
+			      // The origin for this image is 0,0.
+			      origin: new google.maps.Point(0,0),
+			      // The anchor for this image is the base of the flagpole at 0,32.
+			      anchor: new google.maps.Point(8, 8)
+			    },
 			    shadow: null,
 			    zIndex: 999,
 			    map: wMap
@@ -78,6 +81,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		var promptBox = new google.maps.InfoWindow({content:'<div><img src="'+model.mate.pic+'" class="profileThumb"/><p>' + model.mate.name + ' wants to chat with you!</p></div>'})
 		promptBox.open(wMap,mateLocation);
 		$("#waitingRoomFooter").show("fast");
+		$("#mateName").hide("fast");
 	}
 
 
@@ -96,6 +100,8 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 				requestPrompt();
 			}else if("renderMap" === code[msg]){
 				updateMap();
+			}else if("hideRequest" === code[msg]){
+				$("#mateName").hide("fast");
 			}
 		}
 	}

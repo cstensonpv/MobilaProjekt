@@ -1,14 +1,12 @@
 var ProfileView = function(container, model, cropCtrl){
-  console.log(window.location);
+  console.log("profileview");
   this.sendName = $('#sendName');
   this.selectPic = $('#selectPic');
   this.photoCanvas = document.getElementById("capturedPhoto"); //måste vara ett pure canvas obj, kan inte vara jQuery
   this.video = document.getElementById("video");
   this.body = $('#body');
   this.videoObj = { "video": true }
-  //this.context = this.photoCanvas.getContext("2d");
-
-  model.shareLocation();
+  this.context = this.photoCanvas.getContext("2d");
 
   this.errBack = function(error) {
       console.log("Video capture error: ", error.code); 

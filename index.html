@@ -95,6 +95,7 @@
       padding:10px;
       margin-top:5px;
       margin-right: 10px;
+      word-wrap:break-word;
     }
 
     .ourFooter{
@@ -120,9 +121,10 @@
       border-radius: 20px;
       padding:10px;
       margin-top:5px;
+      word-wrap: break-word;
     }
 
-    #waitingRoomFooter{
+    #waitingRoomFooter, #mateName{
       display: none;
     }
 
@@ -157,7 +159,7 @@
         <input id="selectPic" type="file" accept="image/*"></input>
       </div>
       <!--video id="video" width="640" height="480" autoplay></video-->
-      <button id="sendName" style="width:95%;margin:0 auto;margin-top:50px">Done!</button>
+      <button id="sendName" style="width:95%;margin:0 auto;margin-top:50px" href="waitingRoom">Done!</button>
       <!--canvas id="capturedPhoto" width="500" height="400">
       </canvas-->
     </div>
@@ -176,6 +178,7 @@
       <div class="ourFooter" data-theme="a" id="waitingRoomFooter">
         <button id="btnDeny" data-theme="b" style="width:50%;display:inline-block">Deny</button><button id="btnAccept" data-theme="a" style="width:50%;display:inline-block">Accept</button>          
       </div>
+      <div class="ourFooter" data-theme="a" id="mateName"><h1>You sent a request!</h1></div>
     </div>
 
 
@@ -204,7 +207,7 @@
       <div data-role="header" data-position="fixed" id="header">
         <h2>Who dat?</h2>
       </div>
-      <p>This app requires you to share your location!</p>
+      <p>Your shared location is disabled! Please enable it to enter the waiting room</p>
       <button id="btnLocation">Share location</button>
     </div>
 
