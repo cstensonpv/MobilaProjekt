@@ -1,5 +1,5 @@
 var ProfileView = function(container, model, cropCtrl){
-  console.log("profileview");
+  console.log(window.location);
   this.sendName = $('#sendName');
   this.selectPic = $('#selectPic');
   this.photoCanvas = document.getElementById("capturedPhoto"); //måste vara ett pure canvas obj, kan inte vara jQuery
