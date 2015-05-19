@@ -118,6 +118,7 @@ var ChatView = function(container, model){
           }else{
             var user = msg.sender.name;
             var msgType = "theirMsg";
+            window.navigator.vibrate(1000);
           }
         output.html(output.html() + '<div class="'+msgType+'"><b>' + user +"</b> (" + msg.timestamp + "):<br/>" + msg.content + '</div>');
         output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);

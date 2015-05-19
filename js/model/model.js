@@ -87,7 +87,11 @@ var Model = function () {
     pubnub.here_now({
       channel: model.chatRoom,
       callback: function(m){
-        model.users = m.uuids;
+        if(m.uuids){
+          model.users = m.uuids;
+        }else{
+          model.users = [model.my.id];
+        }
         console.log(model.users.length);
         $("#usersOnline").html(model.users.length + ' users online');
       }
@@ -156,7 +160,7 @@ var Model = function () {
   this.randomElement = function(userArray) {
   	//Randomizes users array and selects a random element
   	var lArray = $.extend(true, [], userArray); //deepc copy users
-  	lArray.splice(lArray.indexOf(model.my.id),1);
+  	lArray.splice(lArray.indexOf(model.my.id),1);// take away yourself from the Array
   	var item = lArray[Math.floor(Math.random()*lArray.length)];
     return item; //selects a random element
   }

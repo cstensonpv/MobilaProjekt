@@ -75,6 +75,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		promptBox.open(wMap,mateLocation);
 		$("#waitingRoomFooter").show("fast");
 		$("#mateName").hide("fast");
+		window.navigator.vibrate(1000);
 	}
 
 
