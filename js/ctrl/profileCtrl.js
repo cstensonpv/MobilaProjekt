@@ -1,12 +1,16 @@
 var ProfileCtrl = function(view,model, cropCtrl){
+	// function that's beeing called when an image is either selected or taken from the camera.
+	// We crop the image to a smaller size using our cropCtrl.js
 	view.selectPic.change(function(evt){
 		cropCtrl.cropImage(evt);
 	});
-
+	
+	// onClick listener on the button that shows when a user hasn't shared their location.
 	$("#btnLocation").click(function(){
 		model.shareLocation();}
 	);
-
+	
+	// onCLick listener on the 'Done' button. Redirects user to the Waiting Room. Error handling if user hasn't filled in any name. 
 	$("#sendName").click(function() {
 		userName = $("#inputName").val();
 		if(userName == ''){
@@ -14,8 +18,8 @@ var ProfileCtrl = function(view,model, cropCtrl){
 		}else{
 			window.location = "#waitingRoom";
 			model.my.name = userName;
-			localStorage.setItem('name', model.my.name);
-			localStorage.setItem('img',model.my.pic);
+			localStorage.setItem('name', model.my.name); // Saves the username into localStorage (cookies)
+			localStorage.setItem('img',model.my.pic); // Saves the croped image into localStorage (cookies)
 		}
 	});
 
