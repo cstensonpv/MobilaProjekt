@@ -23,7 +23,7 @@ var ProfileCtrl = function(view,model, cropCtrl){
 		}
 	});
 
-	//lånat från http://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
+	//borrowed from http://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
 	function convertImgToBase64URL(url, callback, outputFormat){
 	    var img = new Image();
 	    img.crossOrigin = 'Anonymous';
