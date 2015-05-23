@@ -1,4 +1,5 @@
 var ChatView = function(container, model){
+  // initiate variables
   var directionsDisplay;
   var directionsService = new google.maps.DirectionsService();
   var dMap;
@@ -34,7 +35,8 @@ var ChatView = function(container, model){
     });
   }
 
-  this.mapExpand = function(){  
+  this.mapExpand = function(){
+    //checks current size of map and if it is small it makes it to he bigger size. and hides the chat.  
     // kollar ifall kartan är liten, om så, ändrar storlek till stor. Visar Stäng Karta knapp och gömmer chatten.
     var map = $('#map-directions');
     var smallMapHeight = (window.innerHeight*0.17).toFixed(0) + 'px';
@@ -52,6 +54,7 @@ var ChatView = function(container, model){
   }
 
   this.mapShrink = function(){
+    // changes size on map to small(if big) and hides close map button and shows the chat.
     // Ändrar kartstorlek till liten. Gömmer Stäng Karta knapp och visar chatten.
     console.log("Shrinks map");
     var map = $('#map-directions');
@@ -66,6 +69,7 @@ var ChatView = function(container, model){
   }
 
   var calcRoute = function() {
+    //makes a call to get directions and displys it n map.
     if(model.my.pos && model.mate.pos){
       var request = {
           origin:model.my.pos,
@@ -84,6 +88,7 @@ var ChatView = function(container, model){
   };
 
   var newControl = function(map, text) { //Funktion för diverse kontrollknappar.
+    //Used to add icon and text with expected walkingtime to the chat partner.
 
     // Set CSS for the control border
     var controlDiv = document.createElement('div');
@@ -108,6 +113,7 @@ var ChatView = function(container, model){
   }
 
   var enterChat = function(){
+    //Sets up the chat and subscribes to the right channel with the crrect responses on sent and recived msgs.
     var output = $("#chatOutput");
     model.pubnub.subscribe({
       'channel'   : model.activeChannels[0],
@@ -125,7 +131,7 @@ var ChatView = function(container, model){
         //chatViewCtrl.refreshController();
       },
       presence: function(m){
-        //join och leave meddelande
+        //join och leave messages
         if(m.action == "leave"){
           output.html(output.html() + '<div class=\'infoMsg\'>' + model.mate.name + ' has left the chat</div>');
           output.animate({scrollTop: output[0].scrollHeight - output.height()}, 500);
