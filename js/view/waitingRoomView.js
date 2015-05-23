@@ -19,7 +19,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 
 	    wMap = new google.maps.Map(wMapDiv, mapOptions);
 	    model.getLocation(function(pos){wMap.setCenter(pos)});
-
+	    // creates a marker that's beeing used for my position on the map.
 	    var myLocation = new google.maps.Marker({
 		    clickable: false,
 		    icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
@@ -30,14 +30,15 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 		    zIndex: 998,
 		    map: wMap
 		});
-	    
+	    	// Sets my position as a marker on the map.
 	   	var updateMyLocation = function(pos){
 	    	myLocation.setPosition(pos);
 	    }
+	    // updates my position on the map every 0.2 seconds.
 	    setInterval(function(){
 	    	model.getLocation(updateMyLocation);
 	    }, 200);
-
+		// when the jQuery page is shown, we trigger a resize for the google map object so it renders correctly on screen.
 		$(document).bind('pageshow',function(event, data){
 			google.maps.event.trigger(wMap,'resize');
 			wMap.setCenter(model.my.pos);
@@ -45,11 +46,12 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	}
 
 	var setMatePos = function(){
-		// sets the marker for the chat mate!
+		// if we have no pending chat mate, the marker is deleted from the map.
 		if(mateLocation != null || (mateLocation != null && model.mate.pos == null)){
 			mateLocation.setMap(null);
 			$("#waitingRoomFooter").hide("fast");
 		}
+		// if a chat mate is found, we add a red marker on that persons location on the map.
 		if(model.mate.pos != null){
 		    mateLocation = new google.maps.Marker({
 			    clickable: false,
@@ -69,7 +71,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 			mateLocation.setPosition(model.mate.pos);
 		}
 	}
-
+	// shows the request box on screen when a chat request is recieved.
 	var requestPrompt = function(){
 		var promptBox = new google.maps.InfoWindow({content:'<div><img src="'+model.mate.pic+'" class="profileThumb"/><p>' + model.mate.name + ' wants to chat with you!</p></div>'})
 		promptBox.open(wMap,mateLocation);
@@ -82,7 +84,7 @@ var WaitingRoomView = function(container,model,shakeCtrl){
 	var updateMap = function(){
 		initialize();
 	}
-	
+	// functions that are called from 'Notify Observers' when this view needs to be updated.
 	this.update = function(code){
 		for (var msg in code){
 			if("updateMatePos" === code[msg]){
