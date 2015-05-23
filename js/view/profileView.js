@@ -5,9 +5,9 @@ var ProfileView = function(container, model, cropCtrl){
   this.video = document.getElementById("video");
   this.body = $('#body');
 
-  model.shareLocation();
+  model.shareLocation(); // user location is collected and stored.
 
-  // cookies.
+  // Checks if the user has stored information in the localStorage.
   if (localStorage.name && localStorage.img) {
     model.my.name = localStorage.getItem("name");
     model.my.pic = localStorage.getItem("img");
